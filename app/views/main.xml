@@ -1,0 +1,6 @@
+<Alloy>
+	<Window class="container"> <!-- index window-->
+		<Label id="label">Splash Screen</Label>
+		<Button id="theButton" onClick="sendClient">Send Client</Button>
+	</Window>
+</Alloy>

@@ -1,0 +1,10 @@
+<Alloy>
+	<Window title="Forms">
+		<RightNavButton>
+			<Button id="addFormButton" title="+" onClick="testAPI"/>
+		</RightNavButton>
+		<!-- rightNavButton="addFormButton" -->
+		<TableView id="formsTableView"/>
+	</Window>
+	<!-- <Button id="addFormButton" title="add"/> -->
+</Alloy>
