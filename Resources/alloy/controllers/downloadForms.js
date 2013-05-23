@@ -32,7 +32,7 @@ function Controller() {
         HTTP_CLIENT.send();
     }
     function downloadTemplate(event) {
-        alert(event.rowData.rowID);
+        alert("Row ID: " + event.rowData.rowID);
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;

@@ -1,7 +1,9 @@
 $.downloadTemplatesWindow.modal = true;
 $.downloadTemplatesWindow.open();
 
+// Called immediately upon loading the view
 loadTemplates();
+
 
 //Callback method for done button
 function doneButtonClicked() {
@@ -39,7 +41,6 @@ function loadTemplates() {
 			var form = Ti.UI.createLabel({
 				text: templatesFromJSON[i].name
 			});
-			
 			singleTemplate.add(form);
 			
 			// Load singe template into array
@@ -55,13 +56,13 @@ function loadTemplates() {
 	    downloadTemplate(e);
 	});
 
-	var formsAPI = 'http://www.talkivi.org/talkivi-server/ws/formscat?format=JSON';
-	HTTP_CLIENT.open("POST", formsAPI);
+	var templatesAPI = 'http://www.talkivi.org/talkivi-server/ws/formscat?format=JSON';
+	HTTP_CLIENT.open("POST", templatesAPI);
 	HTTP_CLIENT.send();
 }
 
 
 // When a template is selected,
 function downloadTemplate(event) {
-	alert(event.rowData.rowID);
+	alert("Row ID: " + event.rowData.rowID);
 }
