@@ -1,5 +1,8 @@
 <Alloy>
-	<View class="container">
-		<Label>Download Forms here</Label>
-	</View>
+	<Window id="downloadTemplatesWindow" class="container" title="Download Forms">
+		<RightNavButton>
+			<Button id="doneButton" title="Done" onClick="doneButtonClicked"/>
+		</RightNavButton>
+		<TableView id="templatesForDownload"/>
+	</Window>
 </Alloy>

@@ -1,7 +1,6 @@
 function Controller() {
     function addFormsButtonClicked() {
         $.downloadForms = Alloy.createController("downloadForms");
-        $.forms.add($.downloadForms.getView());
     }
     function editFormsButtonClicked() {
         if ($.formsTableView.editing) {
@@ -41,6 +40,7 @@ function Controller() {
     $.__views.forms.add($.__views.formsTableView);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    $.formsTableView.moveable = true;
     __defers["$.__views.addFormButton!click!addFormsButtonClicked"] && $.__views.addFormButton.addEventListener("click", addFormsButtonClicked);
     __defers["$.__views.editFormsButton!click!editFormsButtonClicked"] && $.__views.editFormsButton.addEventListener("click", editFormsButtonClicked);
     _.extend($, exports);
