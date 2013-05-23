@@ -4,16 +4,16 @@ function Controller() {
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
-    $.__views.settings = Ti.UI.createView({
+    $.__views.downloadForms = Ti.UI.createView({
         backgroundColor: "white",
-        id: "settings"
+        id: "downloadForms"
     });
-    $.__views.settings && $.addTopLevelView($.__views.settings);
-    $.__views.__alloyId13 = Ti.UI.createLabel({
-        text: "Settings",
-        id: "__alloyId13"
+    $.__views.downloadForms && $.addTopLevelView($.__views.downloadForms);
+    $.__views.__alloyId1 = Ti.UI.createLabel({
+        text: "Download Forms here",
+        id: "__alloyId1"
     });
-    $.__views.settings.add($.__views.__alloyId13);
+    $.__views.downloadForms.add($.__views.__alloyId1);
     exports.destroy = function() {};
     _.extend($, $.__views);
     _.extend($, exports);

@@ -7,52 +7,52 @@ function Controller() {
     $.__views.index = Ti.UI.createTabGroup({
         id: "index"
     });
-    $.__views.__alloyId4 = Alloy.createController("forms", {
-        id: "__alloyId4"
+    $.__views.__alloyId6 = Alloy.createController("forms", {
+        id: "__alloyId6"
     });
-    $.__views.__alloyId3 = Ti.UI.createTab({
-        window: $.__views.__alloyId4.getViewEx({
+    $.__views.__alloyId5 = Ti.UI.createTab({
+        window: $.__views.__alloyId6.getViewEx({
             recurse: true
         }),
         title: "Forms",
         icon: "kiwi.png",
-        id: "__alloyId3"
+        id: "__alloyId5"
     });
-    $.__views.index.addTab($.__views.__alloyId3);
-    $.__views.__alloyId7 = Ti.UI.createWindow({
+    $.__views.index.addTab($.__views.__alloyId5);
+    $.__views.__alloyId8 = Ti.UI.createWindow({
         backgroundColor: "#fff",
         title: "Data",
-        id: "__alloyId7"
+        id: "__alloyId8"
     });
-    $.__views.__alloyId8 = Alloy.createController("data", {
-        id: "__alloyId8",
-        __parentSymbol: $.__views.__alloyId7
+    $.__views.__alloyId9 = Alloy.createController("data", {
+        id: "__alloyId9",
+        __parentSymbol: $.__views.__alloyId8
     });
-    $.__views.__alloyId8.setParent($.__views.__alloyId7);
-    $.__views.__alloyId6 = Ti.UI.createTab({
-        window: $.__views.__alloyId7,
+    $.__views.__alloyId9.setParent($.__views.__alloyId8);
+    $.__views.__alloyId7 = Ti.UI.createTab({
+        window: $.__views.__alloyId8,
         title: "Data",
         icon: "globe_green.png",
-        id: "__alloyId6"
+        id: "__alloyId7"
     });
-    $.__views.index.addTab($.__views.__alloyId6);
-    $.__views.__alloyId10 = Ti.UI.createWindow({
+    $.__views.index.addTab($.__views.__alloyId7);
+    $.__views.__alloyId11 = Ti.UI.createWindow({
         backgroundColor: "#fff",
         title: "Settings",
-        id: "__alloyId10"
+        id: "__alloyId11"
     });
-    $.__views.__alloyId11 = Alloy.createController("settings", {
-        id: "__alloyId11",
-        __parentSymbol: $.__views.__alloyId10
+    $.__views.__alloyId12 = Alloy.createController("settings", {
+        id: "__alloyId12",
+        __parentSymbol: $.__views.__alloyId11
     });
-    $.__views.__alloyId11.setParent($.__views.__alloyId10);
-    $.__views.__alloyId9 = Ti.UI.createTab({
-        window: $.__views.__alloyId10,
+    $.__views.__alloyId12.setParent($.__views.__alloyId11);
+    $.__views.__alloyId10 = Ti.UI.createTab({
+        window: $.__views.__alloyId11,
         title: "Settings",
         icon: "cog_wheel.png",
-        id: "__alloyId9"
+        id: "__alloyId10"
     });
-    $.__views.index.addTab($.__views.__alloyId9);
+    $.__views.index.addTab($.__views.__alloyId10);
     $.__views.index && $.addTopLevelView($.__views.index);
     exports.destroy = function() {};
     _.extend($, $.__views);

@@ -1,10 +1,11 @@
 <Alloy>
-	<Window title="Forms">
+	<Window id="forms" title="Forms">
 		<RightNavButton>
-			<Button id="addFormButton" title="+" onClick="testAPI"/>
+			<Button id="addFormButton" title="Add" onClick="addFormsButtonClicked"/>
 		</RightNavButton>
-		<!-- rightNavButton="addFormButton" -->
+		<LeftNavButton>
+			<Button id="editFormsButton" title="Edit" onClick="editFormsButtonClicked"/>
+		</LeftNavButton>
 		<TableView id="formsTableView"/>
 	</Window>
-	<!-- <Button id="addFormButton" title="add"/> -->
 </Alloy>
