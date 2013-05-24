@@ -8,6 +8,7 @@ loadTemplates();
 //Callback method for done button
 function doneButtonClicked() {
 	$.downloadTemplatesWindow.close();
+	Ti.App.fireEvent('populateTemplates');
 }
 
 
@@ -26,34 +27,49 @@ function loadTemplates() {
 		var templates = []
 		// For each object (form) in JSON...
 		for (var i = 0; i < templatesFromJSON.length; ++i) {
+			// Create Label
+			var label = Ti.UI.createLabel({
+				id: i,
+				text: templatesFromJSON[i].name,
+				color: 'black'
+			});
+			
 			// Create template
 			var singleTemplate = Ti.UI.createTableViewRow({
 				id: i,
+				label: label,
 				height: '40dp',
 				backgroundColor: 'white',
 				rightImage: 'plus_icon.png',
 				selectedBackgroundColor: 'gray',
 				rowID: templatesFromJSON[i].rowid
-				//selectionStyle: 'none'
 			});
+
+			// Checks if they already have downloaded the template
+			if (Ti.App.Properties.getList("activeTemplates").indexOf(templatesFromJSON[i].name) != -1) {
+				label.color = 'gray';
+				singleTemplate.selectedColor = 'white';
+				singleTemplate.selectedBackgroundColor = 'white';
+			}
 			
-			// Add label to the template
-			var form = Ti.UI.createLabel({
-				text: templatesFromJSON[i].name
-			});
-			singleTemplate.add(form);
+			singleTemplate.add(label);
 			
 			// Load singe template into array
 			templates.push(singleTemplate);
 		}
-		
 		// Load templates into TableView
 		$.templatesForDownload.data = templates;
 	};
 	
 	// Add eventListener for TableView
-	$.templatesForDownload.addEventListener('click', function(e) {
-	    downloadTemplate(e);
+	$.templatesForDownload.addEventListener('click', function(event) {
+		// If they haven't downloaded the form before
+		if (Ti.App.Properties.getList("activeTemplates").indexOf(event.rowData.label.text) == -1) {
+			event.rowData.label.color = 'gray';
+			event.rowData.selectedColor = 'white';
+			event.rowData.selectedBackgroundColor = 'white';
+			downloadTemplate(event);
+		}
 	});
 
 	var templatesAPI = 'http://www.talkivi.org/talkivi-server/ws/formscat?format=JSON';
@@ -64,5 +80,25 @@ function loadTemplates() {
 
 // When a template is selected,
 function downloadTemplate(event) {
-	alert("Row ID: " + event.rowData.rowID);
+	
+	var HTTP_CLIENT = Ti.Network.createHTTPClient();
+	
+	// Onload gets called once the client is opened
+	HTTP_CLIENT.onload = function() { 
+		//var templateFromJSON = JSON.parse(this.responseText);
+		var templateFromJSON = JSON.parse('{ "rowid": 3, "name": "Single Text Field", "form_type_rowid_fk": 1, "form_type": "Sample Card", "description": "A test form with examples of each currently supported field type.", "timestamp_loaded_utc": "2013-05-20T21:30:30.641221+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.641221+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public", "talkiviFields": [ {"rowid": 1, "name": "Name", "prompt": "Name", "field_type_rowid_fk": 1, "field_type": "Text", "required": "Yes", "length": 100, "num_decimals": 0, "default_value": "", "numeric_min": "", "numeric_max": "", "validation_set_rowid_fk": "", "help_text": "", "description": "The name of something.", "timestamp_loaded_utc": "2013-05-20T21:30:30.487471+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.487471+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public" } ] }');
+
+		// Storing the template into properties for local persistence
+		Ti.App.Properties.setObject(templateFromJSON.name, templateFromJSON);
+		var tempTemplates = Ti.App.Properties.getList("activeTemplates");
+		tempTemplates.push(templateFromJSON.name);
+		Ti.App.Properties.setList("activeTemplates", tempTemplates);
+		
+		Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
+	}
+	
+	
+	var templateAPI = 'http://www.talkivi.org/talkivi-server/ws/form?rowid=' + event.rowData.rowID + '&format=JSON';
+	HTTP_CLIENT.open("POST", templateAPI);
+	HTTP_CLIENT.send();
 }

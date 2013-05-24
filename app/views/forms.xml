@@ -1,11 +1,11 @@
 <Alloy>
 	<Window id="forms" title="Forms">
 		<RightNavButton>
-			<Button id="addFormButton" title="Add" onClick="addFormsButtonClicked"/>
+			<Button id="addTemplatesButton" title="Add" onClick="addTemplatesButtonClicked"/>
 		</RightNavButton>
 		<LeftNavButton>
-			<Button id="editFormsButton" title="Edit" onClick="editFormsButtonClicked"/>
+			<Button id="editTemplatesButton" title="Edit" onClick="editTemplatesButtonClicked"/>
 		</LeftNavButton>
-		<TableView id="formsTableView"/>
+		<TableView id="templatesTableView"/>
 	</Window>
 </Alloy>

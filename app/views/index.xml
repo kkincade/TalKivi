@@ -1,7 +1,7 @@
 <Alloy>
 	<TabGroup>
 		<Tab title="Forms" icon="kiwi.png">
-			<Require src="forms"/>
+			<Require src="forms" id="formsTab"/>
 		</Tab>
 		<Tab title="Data" icon="globe_green.png">
 			<Window title="Data">
