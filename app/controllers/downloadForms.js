@@ -1,7 +1,9 @@
 $.downloadTemplatesWindow.modal = true;
 $.downloadTemplatesWindow.open();
 
-// Called immediately upon loading the view
+var path = Titanium.Filesystem.resourcesDirectory;
+
+// Loads templates for download immediately upon loading the view
 loadTemplates();
 
 
@@ -11,20 +13,24 @@ function doneButtonClicked() {
 	Ti.App.fireEvent('populateTemplates');
 }
 
+// Android uses the back button instead of the done button
+$.downloadTemplatesWindow.addEventListener('androidback', function(event) { 
+	$.downloadTemplatesWindow.close();
+	Ti.App.fireEvent('populateTemplates');
+});
 
-// Creates an HTTP client, retrieves forms from JSON, and displays list of forms available for download
+
+// Creates an HTTP client, retrieves templates from JSON, and displays list of forms available for download
 function loadTemplates() {
 
 	var HTTP_CLIENT = Ti.Network.createHTTPClient();
 	
 	// Onload gets called once the client is opened
 	HTTP_CLIENT.onload = function() { 
-
 		// Store fetched data into parsed array
-		//var data = '[{"owner_rowid_fk":"1","owner_username":"talkivi","access_rowid_fk":"2","access_name":"Public","form_type_rowid_fk":"1","form_type":"Sample Card","null_rowid":-99,"rowid":"3","record_status_rowid_fk":"1","record_status":"Active","name":"Example Text Field","description":"Example public form with a single field for text data entry.  The world\'s simplest form.","timestamp_loaded_utc":"2013-05-13T17:07:17.443235+00:00","timestamp_modified_utc":"2013-05-13T17:07:17.443235+00:00"},{"owner_rowid_fk":"1","owner_username":"talkivi","access_rowid_fk":"2","access_name":"Public","form_type_rowid_fk":"1","form_type":"Sample Card","null_rowid":-99,"rowid":"1","record_status_rowid_fk":"1","record_status":"Active","name":"Example Soil Sample Card","description":"Example public sample card to collect soil data.","timestamp_loaded_utc":"2013-04-13T02:27:21.837183+00:00","timestamp_modified_utc":"2013-04-13T02:27:21.837183+00:00"}]';
 		var templatesFromJSON = JSON.parse(this.responseText);
-		
 		var templates = []
+		
 		// For each object (form) in JSON...
 		for (var i = 0; i < templatesFromJSON.length; ++i) {
 			// Create Label
@@ -41,20 +47,26 @@ function loadTemplates() {
 				height: '40dp',
 				backgroundColor: 'white',
 				rightImage: 'plus_icon.png',
-				selectedBackgroundColor: 'gray',
+				backgroundSelectedColor: 'gray',
 				rowID: templatesFromJSON[i].rowid
 			});
+			
+			if (OS_ANDROID) {
+				$.downloadTemplatesWindow.backgroundColor = 'black';
+				singleTemplate.label.color = 'white';
+				singleTemplate.backgroundColor = 'black';
+				singleTemplate.rightImage = path + 'plus_icon_android.png';
+			}
 
 			// Checks if they already have downloaded the template
 			if (Ti.App.Properties.getList("activeTemplates").indexOf(templatesFromJSON[i].name) != -1) {
 				label.color = 'gray';
 				singleTemplate.selectedColor = 'white';
-				singleTemplate.selectedBackgroundColor = 'white';
+				singleTemplate.backgroundSelectedColor = 'white';
 			}
 			
-			singleTemplate.add(label);
-			
 			// Load singe template into array
+			singleTemplate.add(label);
 			templates.push(singleTemplate);
 		}
 		// Load templates into TableView
@@ -65,10 +77,11 @@ function loadTemplates() {
 	$.templatesForDownload.addEventListener('click', function(event) {
 		// If they haven't downloaded the form before
 		if (Ti.App.Properties.getList("activeTemplates").indexOf(event.rowData.label.text) == -1) {
-			event.rowData.label.color = 'gray';
-			event.rowData.selectedColor = 'white';
-			event.rowData.selectedBackgroundColor = 'white';
 			downloadTemplate(event);
+			event.rowData.label.color = 'gray';
+		} else {
+			event.rowData.selectedColor = 'white';
+			event.rowData.backgroundSelectedColor = 'white';
 		}
 	});
 
@@ -85,9 +98,8 @@ function downloadTemplate(event) {
 	
 	// Onload gets called once the client is opened
 	HTTP_CLIENT.onload = function() { 
-		//var templateFromJSON = JSON.parse(this.responseText);
-		var templateFromJSON = JSON.parse('{ "rowid": 3, "name": "Single Text Field", "form_type_rowid_fk": 1, "form_type": "Sample Card", "description": "A test form with examples of each currently supported field type.", "timestamp_loaded_utc": "2013-05-20T21:30:30.641221+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.641221+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public", "talkiviFields": [ {"rowid": 1, "name": "Name", "prompt": "Name", "field_type_rowid_fk": 1, "field_type": "Text", "required": "Yes", "length": 100, "num_decimals": 0, "default_value": "", "numeric_min": "", "numeric_max": "", "validation_set_rowid_fk": "", "help_text": "", "description": "The name of something.", "timestamp_loaded_utc": "2013-05-20T21:30:30.487471+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.487471+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public" } ] }');
-
+		var templateFromJSON = JSON.parse(this.responseText);
+		
 		// Storing the template into properties for local persistence
 		Ti.App.Properties.setObject(templateFromJSON.name, templateFromJSON);
 		var tempTemplates = Ti.App.Properties.getList("activeTemplates");
@@ -96,7 +108,6 @@ function downloadTemplate(event) {
 		
 		Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
 	}
-	
 	
 	var templateAPI = 'http://www.talkivi.org/talkivi-server/ws/form?rowid=' + event.rowData.rowID + '&format=JSON';
 	HTTP_CLIENT.open("POST", templateAPI);

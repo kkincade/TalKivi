@@ -20,13 +20,13 @@ function Controller() {
                     height: "40dp",
                     backgroundColor: "white",
                     rightImage: "plus_icon.png",
-                    selectedBackgroundColor: "gray",
+                    backgroundSelectedColor: "gray",
                     rowID: templatesFromJSON[i].rowid
                 });
                 if (-1 != Ti.App.Properties.getList("activeTemplates").indexOf(templatesFromJSON[i].name)) {
                     label.color = "gray";
                     singleTemplate.selectedColor = "white";
-                    singleTemplate.selectedBackgroundColor = "white";
+                    singleTemplate.backgroundSelectedColor = "white";
                 }
                 singleTemplate.add(label);
                 templates.push(singleTemplate);
@@ -35,10 +35,11 @@ function Controller() {
         };
         $.templatesForDownload.addEventListener("click", function(event) {
             if (-1 == Ti.App.Properties.getList("activeTemplates").indexOf(event.rowData.label.text)) {
-                event.rowData.label.color = "gray";
-                event.rowData.selectedColor = "white";
-                event.rowData.selectedBackgroundColor = "white";
                 downloadTemplate(event);
+                event.rowData.label.color = "gray";
+            } else {
+                event.rowData.selectedColor = "white";
+                event.rowData.backgroundSelectedColor = "white";
             }
         });
         var templatesAPI = "http://www.talkivi.org/talkivi-server/ws/formscat?format=JSON";
@@ -48,7 +49,7 @@ function Controller() {
     function downloadTemplate(event) {
         var HTTP_CLIENT = Ti.Network.createHTTPClient();
         HTTP_CLIENT.onload = function() {
-            var templateFromJSON = JSON.parse('{ "rowid": 3, "name": "Single Text Field", "form_type_rowid_fk": 1, "form_type": "Sample Card", "description": "A test form with examples of each currently supported field type.", "timestamp_loaded_utc": "2013-05-20T21:30:30.641221+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.641221+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public", "talkiviFields": [ {"rowid": 1, "name": "Name", "prompt": "Name", "field_type_rowid_fk": 1, "field_type": "Text", "required": "Yes", "length": 100, "num_decimals": 0, "default_value": "", "numeric_min": "", "numeric_max": "", "validation_set_rowid_fk": "", "help_text": "", "description": "The name of something.", "timestamp_loaded_utc": "2013-05-20T21:30:30.487471+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.487471+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public" } ] }');
+            var templateFromJSON = JSON.parse(this.responseText);
             Ti.App.Properties.setObject(templateFromJSON.name, templateFromJSON);
             var tempTemplates = Ti.App.Properties.getList("activeTemplates");
             tempTemplates.push(templateFromJSON.name);
@@ -85,7 +86,14 @@ function Controller() {
     _.extend($, $.__views);
     $.downloadTemplatesWindow.modal = true;
     $.downloadTemplatesWindow.open();
+    {
+        Titanium.Filesystem.resourcesDirectory;
+    }
     loadTemplates();
+    $.downloadTemplatesWindow.addEventListener("androidback", function() {
+        $.downloadTemplatesWindow.close();
+        Ti.App.fireEvent("populateTemplates");
+    });
     __defers["$.__views.doneButton!click!doneButtonClicked"] && $.__views.doneButton.addEventListener("click", doneButtonClicked);
     _.extend($, exports);
 }

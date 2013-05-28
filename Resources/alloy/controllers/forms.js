@@ -1,15 +1,22 @@
 function Controller() {
+    function deleteTemplate(event) {
+        var templates = Ti.App.Properties.getList("activeTemplates");
+        templates.splice(templates.indexOf(event.rowData.label.text), 1);
+        Ti.App.Properties.setList("activeTemplates", templates);
+        Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
+    }
     function addTemplatesButtonClicked() {
         $.downloadForms = Alloy.createController("downloadForms");
-        alert("Done adding...");
     }
     function editTemplatesButtonClicked() {
         if ($.templatesTableView.editing) {
-            $.templatesTableView.editing = false;
+            $.editTemplatesButton.title = "Edit";
             $.addTemplatesButton.enabled = true;
+            $.templatesTableView.editing = false;
         } else if ($.templatesTableView.sections.length > 0) {
-            $.templatesTableView.editing = true;
+            $.editTemplatesButton.title = "Done";
             $.addTemplatesButton.enabled = false;
+            $.templatesTableView.editing = true;
         }
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
@@ -42,7 +49,6 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     Ti.App.addEventListener("populateTemplates", function() {
-        alert("Fire Away!");
         var activeTemplates = Ti.App.Properties.getList("activeTemplates");
         var templates = [];
         for (var i = 0; activeTemplates.length > i; ++i) {
@@ -57,15 +63,23 @@ function Controller() {
                 height: "40dp",
                 backgroundColor: "white",
                 hasDetail: true,
-                selectedBackgroundColor: "gray"
+                backgroundSelectedColor: "gray"
             });
             singleTemplate.add(label);
             templates.push(singleTemplate);
         }
         $.templatesTableView.data = templates;
+        $.templatesTableView.editable = true;
+        $.templatesTableView.moveable = true;
+    });
+    $.templatesTableView.addEventListener("delete", function(event) {
+        deleteTemplate(event);
+    });
+    $.templatesTableView.addEventListener("longpress", function(event) {
     });
     __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] && $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked);
     __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] && $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked);
+    __defers["$.__views.__alloyId6!click!addTemplatesButtonClicked"] && $.__views.__alloyId6.addEventListener("click", addTemplatesButtonClicked);
     _.extend($, exports);
 }
 

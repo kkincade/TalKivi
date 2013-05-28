@@ -1,17 +1,9 @@
-
-
 function initialize() {
-	alert("opened forms tab");
-	var giantTemplate = '{ "rowid": 3, "name": "Test Form", "form_type_rowid_fk": 1, "form_type": "Sample Card", "description": "A test form with examples of each currently supported field type.", "timestamp_loaded_utc": "2013-05-20T21:30:30.641221+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.641221+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public", "talkiviFields": [ {"rowid": 1, "name": "Name", "prompt": "Name", "field_type_rowid_fk": 1, "field_type": "Text", "required": "Yes", "length": 100, "num_decimals": 0, "default_value": "", "numeric_min": "", "numeric_max": "", "validation_set_rowid_fk": "", "help_text": "", "description": "The name of something.", "timestamp_loaded_utc": "2013-05-20T21:30:30.487471+00:00", "timestamp_modified_utc": "2013-05-20T21:30:30.487471+00:00", "owner_rowid_fk": 1, "owner_username": "talkivi", "access_rowid_fk": 2, "access_name": "Public" } ] }'
 	
-	$.templatesTableView.moveable = true; //Try this later once we can select forms
-
-	populateTemplates();
 }
 
 
-Ti.App.addEventListener('populateTemplates', function(){
-	alert("Fire Away!");
+Ti.App.addEventListener('populateTemplates', function() {
 	var activeTemplates = Ti.App.Properties.getList("activeTemplates");
 	var templates = [];
 	
@@ -30,35 +22,82 @@ Ti.App.addEventListener('populateTemplates', function(){
 			height: '40dp',
 			backgroundColor: 'white',
 			hasDetail: true,
-			selectedBackgroundColor: 'gray'
+			backgroundSelectedColor: 'gray'
 		});
 		
-		singleTemplate.add(label);
+		if (OS_ANDROID) {
+			singleTemplate.label.color = 'white';
+			singleTemplate.backgroundColor = 'black';
+			singleTemplate.hasChild = true;
+		}
 		
 		// Load singe template into array
+		singleTemplate.add(label);
 		templates.push(singleTemplate);		
 	}
 
 	// Load templates into TableView
 	$.templatesTableView.data = templates;
+	$.templatesTableView.editable = true;
+	$.templatesTableView.moveable = true;
 });
+
+
+// IOS event listener for delete button on iOS when deleting forms
+$.templatesTableView.addEventListener('delete', function(event) {
+	deleteTemplate(event);
+});
+
+
+// ANDROID event listener for deleting rows (forms)
+$.templatesTableView.addEventListener('longpress', function(event) {
+	if (OS_ANDROID) {
+		// If they long press on a row, create an alert dialog asking if they want to delete the form
+		if (event.rowData != null) {
+			var dialog = Ti.UI.createAlertDialog({ message: "Delete " + event.rowData.label.text + "?", buttonNames: ['Delete', 'Cancel'] });
+			
+			dialog.addEventListener('click', function(e) {
+				if (e.index == 0) { // Delete
+					deleteTemplate(event);
+					Ti.App.fireEvent('populateTemplates');
+				} else {
+					// Do nothing
+				}	
+			});
+			
+			dialog.show();
+		}
+	}
+});
+
+
+function deleteTemplate(event) {
+	var templates = Ti.App.Properties.getList("activeTemplates");
+	templates.splice(templates.indexOf(event.rowData.label.text), 1);
+	Ti.App.Properties.setList("activeTemplates", templates);
+	Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
+	
+}
 
 
 function addTemplatesButtonClicked() {
 	$.downloadForms = Alloy.createController('downloadForms');
-	alert("Done adding...");
-	//populateTemplates();
 }
 
 
 function editTemplatesButtonClicked() {
-	// If we aren't currently editing...
-	if ($.templatesTableView.editing) {
-		$.templatesTableView.editing = false;
-		$.addTemplatesButton.enabled = true;
-	// If we are editing and there are forms to delete
-	} else if ($.templatesTableView.sections.length > 0) {
-		$.templatesTableView.editing = true;
-		$.addTemplatesButton.enabled = false;
+	// Android is handled through long presses
+	if (OS_IOS) {
+		// If we are currently editing, change it to not editing
+		if ($.templatesTableView.editing) {
+			$.editTemplatesButton.title = "Edit";
+			$.addTemplatesButton.enabled = true;
+			$.templatesTableView.editing = false;
+		// If we aren't editing and there are forms to delete
+		} else if ($.templatesTableView.sections.length > 0) {
+			$.editTemplatesButton.title = "Done";
+			$.addTemplatesButton.enabled = false;
+			$.templatesTableView.editing = true;
+		}
 	}
 }
