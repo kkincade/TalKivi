@@ -1,17 +1,7 @@
 <Alloy>
 	<TabGroup>
-		<Tab title="Forms" icon="kiwi.png">
-			<Require src="forms" id="formsTab"/>
-		</Tab>
-		<Tab title="Data" icon="globe_green.png">
-			<Window title="Data">
-				<Require src="data"/>
-			</Window>
-		</Tab>
-		<Tab title="Settings" icon="cog_wheel.png">
-			<Window title="Settings">
-				<Require src="settings"/>
-			</Window>
-		</Tab>
+		<Require src="forms"/>
+		<Require src="data"/>
+		<Require src="settings"/>
 	</TabGroup>
 </Alloy>

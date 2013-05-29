@@ -1,5 +1,7 @@
 <Alloy>
-	<View class="container">
-		<Label>Data</Label>
-	</View>
+	<Tab id="dataTab" title="Data" icon="globe_green.png">
+		<Window id="dataWindow" title="Data">
+			<Label>Data</Label>
+		</Window>
+	</Tab>
 </Alloy>

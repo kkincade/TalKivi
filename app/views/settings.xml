@@ -1,5 +1,7 @@
 <Alloy>
-	<View class="container">
-		<Label>Settings</Label>
-	</View>
+	<Tab id="settingsTab" title="Settings" icon="cog_wheel.png">
+		<Window id="settingsWindow" title="Settings">
+			<Label>Settings</Label>
+		</Window>
+	</Tab>
 </Alloy>

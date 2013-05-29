@@ -1,17 +1,19 @@
 <Alloy>
-	<Window id="forms" title="Forms">
-		<RightNavButton platform='ios'>
-			<Button id="addTemplatesButton" title="Add" onClick="addTemplatesButtonClicked"/>
-		</RightNavButton>
-		
-		<LeftNavButton platform='ios'>
-			<Button id="editTemplatesButton" title="Edit" onClick="editTemplatesButtonClicked"/>
-		</LeftNavButton>
-		
-		<TableView id="templatesTableView">
-		
-		<Menu platform='android'>
-			<MenuItem title='Download Forms' onClick="addTemplatesButtonClicked"/>
-		</Menu>
-	</Window>
+	<Tab id="formsTab" title="Forms" icon="kiwi.png">
+		<Window id="navGroupWindow" title="Forms">
+			<RightNavButton platform='ios'>
+				<Button id="addTemplatesButton" title="Add" onClick="addTemplatesButtonClicked"/>
+			</RightNavButton>
+			
+			<LeftNavButton platform='ios'>
+				<Button id="editTemplatesButton" title="Edit" onClick="editTemplatesButtonClicked"/>
+			</LeftNavButton>
+			
+			<TableView id="templatesTableView">
+			
+			<Menu platform='android'>
+				<MenuItem title='Download Forms' onClick="addTemplatesButtonClicked"/>
+			</Menu>
+		</Window>
+	</Tab>
 </Alloy>

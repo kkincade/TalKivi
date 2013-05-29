@@ -1,0 +1,7 @@
+<Alloy>
+	<Window id="newFormWindow" class="container">		
+		<RightNavButton platform='ios'>
+			<Button id="submitButton" title="Submit" style="Ti.UI.iPhone.SystemButtonStyle.DONE" onClick="submitButtonClicked"/>
+		</RightNavButton>
+	</Window>
+</Alloy>
