@@ -45,8 +45,8 @@ Ti.App.addEventListener('populateTemplates', function() {
 
 // Creates a newForm window when a form is clicked
 $.templatesTableView.addEventListener('click', function(event) {
-	Ti.App.Properties.setString("formNameParameter", event.rowData.label.text);
-	var controller = Alloy.createController('newForm').getView();
+	//Ti.App.Properties.setString("formNameParameter", event.rowData.label.text);
+	var controller = Alloy.createController('newForm', { formName: event.rowData.label.text }).getView();
 	$.formsTab.open(controller);
 });
 

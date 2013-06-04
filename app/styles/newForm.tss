@@ -1,3 +1,13 @@
 ".container": {
 	backgroundColor: "white"
 }
+
+"#scrollView": {
+	showVerticalScrollIndicator : true
+}
+
+"#subView": {
+	width: Ti.UI.FILL,
+	height: Ti.UI.SIZE,
+	layout: 'vertical'
+}

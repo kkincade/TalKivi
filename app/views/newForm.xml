@@ -3,5 +3,9 @@
 		<RightNavButton platform='ios'>
 			<Button id="submitButton" title="Submit" style="Ti.UI.iPhone.SystemButtonStyle.DONE" onClick="submitButtonClicked"/>
 		</RightNavButton>
+		
+		<TableView id="tableView">
+			
+		</TableView>
 	</Window>
 </Alloy>

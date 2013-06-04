@@ -103,9 +103,10 @@ function downloadTemplate(event) {
 		// Storing the template into properties for local persistence
 		Ti.App.Properties.setObject(templateFromJSON.name, templateFromJSON);
 		var tempTemplates = Ti.App.Properties.getList("activeTemplates");
-		tempTemplates.push(templateFromJSON.name);
+		tempTemplates.push(templateFromJSON.name); // We might add "Template" to make sure we aren't confusing template names with properties
 		Ti.App.Properties.setList("activeTemplates", tempTemplates);
 		
+		// TODO: Delete this when not needed anymore
 		Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
 	}
 	
