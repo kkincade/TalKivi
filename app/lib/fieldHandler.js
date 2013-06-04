@@ -3,7 +3,6 @@
 exports.generateFieldView = generateFieldView;
 
 function generateFieldView(fieldObject) {
-	
 	if (fieldObject.field_type == 'Text') { return TextField(fieldObject); }
 	else if (fieldObject.field_type == 'Checkbox') { return CheckboxField(fieldObject); }
 	else if (fieldObject.field_type == 'Integer') { return Integer(fieldObject); }
@@ -21,213 +20,575 @@ function generateFieldView(fieldObject) {
 	else if (fieldObject.field_type == 'Button Selection') { return Button_Selection(fieldObject); }
 	else if (fieldObject.field_type == 'Structural Attitude') { return Structural_Attitude(fieldObject);  }
 	else { return unknownField(fieldObject); }
-
 }
+
 
 function TextField(fieldObject) {
 	
-	var self = Ti.UI.createTableViewRow({
-		title: fieldObject.prompt,
-		fieldObject: fieldObject
-	});
-	
-	self.add(Ti.UI.createTextField({
+	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
-		hintText: fieldObject.description,
-		// Padding
 		top: '10dp', 
 		left: '30dp',
 		right: '10dp',
 		bottom: '10dp'
-	}));
-
-	return self;	
-}
-function CheckboxField(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'orange'
+	})
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
+	
+	self.add(textField);
+	checkLabelLength(self);
 	return self;	
 }
+
+
+function CheckboxField(fieldObject) {
+	
+	var switcher = Ti.UI.createSwitch({
+		value: fieldObject.default_value.toLowerCase(),
+		// Padding
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		right: '10dp',
+		bottom: '10dp'
+	});
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		switcher: switcher,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+
+	self.add(switcher);
+	checkLabelLength(self);
+	return self;	
+}
+
+
 function Integer(fieldObject) {
 	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
-		hintText: fieldObject.description,
-		// Padding
 		top: '10dp', 
 		left: '30dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
 	
-	
 	var self = Ti.UI.createTableViewRow({
-		title: fieldObject.prompt,
+		fieldObject: fieldObject,
 		textField: textField,
-		fieldObject: fieldObject
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
 	});
 	
 	self.add(textField);
-	
-	textField.addEventListener('blur', function(event) {
-		Ti.App.fireEvent('blurCheck', { 
-			row: self
-		});
-	});
+	checkLabelLength(self);
+	return self;	
+}
 
-	return self;	
-}
+
 function Decimal(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'green'
+	
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
 	return self;	
 }
+
+
 function Calculated(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'blue'
+	
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
 	return self;	
 }
+
+
 function Incremental_Text(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'purple'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
 	return self;	
 }
+
+
 function DateField(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'red'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Time(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'orange'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Date_Time(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'yellow'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Message(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'green'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function LocationField(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'blue'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Photo(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'purple'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Recording(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'red'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Selection(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'orange'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Button_Selection(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'yellow'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
 }
+
+
 function Structural_Attitude(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'green'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type ' + fieldObject.field_type + ' not yet implemented.'
-	}));
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
 	return self;	
 }
 
 function unknownField(fieldObject) {
-	var self = Ti.UI.createView({
-		height: '100dp',
-		backgroundColor: 'gray'
+	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
+		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '30dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
-	self.add(Ti.UI.createLabel({
-		text: 'Field type unknown: ' + fieldObject.field_type
-	}));
-	return self;	
+	
+	var self = Ti.UI.createTableViewRow({
+		fieldObject: fieldObject,
+		textField: textField,
+		title: fieldObject.prompt,
+		font: {
+			fontSize: '16dp',
+			fontWeight: 'bold'
+		}
+	});
+	
+	self.add(textField);
+	checkLabelLength(self);
+	return self;		
+}
+
+
+function checkLabelLength(tableViewRow) {
+	var length = tableViewRow.title.length;
+	
+	if (length > 30) {
+		tableViewRow.font = { fontSize: '8dp', fontWeight: 'bold' };
+	} else if (length > 20) {
+		tableViewRow.font = { fontSize: '12dp', fontWeight: 'bold' };
+	} else if (length > 10) {
+		tableViewRow.font = { fontSize: '16dp', fontWeight: 'bold' };
+	}
 }

@@ -1,10 +1,40 @@
 function Controller() {
     function submitButtonClicked() {
-        alert("submit!");
+        var messageString = validateForm();
+        if ("" == messageString) {
+            var alertDialog = Ti.App.createAlertDialog({
+                title: "Success!",
+                message: "Form submitted successfully"
+            });
+            $.newFormWindow.close();
+        } else {
+            var alertDialog = Ti.App.createAlertDialog({
+                title: "Invalid Input",
+                message: messageString
+            });
+            alertDialog.show();
+        }
     }
     function loadTemplate() {
         var template = Ti.App.Properties.getObject(formName);
         formHandler.generateTemplate(template, $.tableView);
+    }
+    function validateForm() {
+        var messageString = "";
+        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
+            var fieldObject = $.tableView.data[0].rows[i].fieldObject;
+            var value = getFieldValue($.tableView.data[0].rows[i]);
+            if ("" == value || null == value) {
+                if ("No" == fieldObject.required) continue;
+                messageString += fieldObject.prompt + " is a required field.\n";
+                continue;
+            }
+            "Text" == fieldObject.field_type || "Checkbox" == fieldObject.field_type || ("Integer" == fieldObject.field_type ? Number(value) > 0 && 0 == value % 1 ? (value > fieldObject.numeric_max || fieldObject.numeric_min > value) && (messageString += fieldObject.prompt + " must be in range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]\n") : messageString += fieldObject.prompt + " must be an integer.\n" : "Decimal" == fieldObject.field_type ? Number(value) > 0 ? (value > fieldObject.numeric_max || fieldObject.numeric_min > value) && (messageString += fieldObject.prompt + " must be in range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]\n") : messageString += fieldObject.prompt + " must be a number.\n" : "Calculated" == fieldObject.field_type || "Incremental Text" == fieldObject.field_type || "Date" == fieldObject.field_type || "Time" == fieldObject.field_type || "Date-Time" == fieldObject.field_type || "Message" == fieldObject.field_type || "Location" == fieldObject.field_type || "Photo" == fieldObject.field_type || "Recording" == fieldObject.field_type || "Selection" == fieldObject.field_type || "Button Selection" == fieldObject.field_type || "Structural Attitude" == fieldObject.field_type);
+        }
+        return messageString;
+    }
+    function getFieldValue(tableViewRow) {
+        return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRowfieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -43,32 +73,6 @@ function Controller() {
             message: "No help text available"
         });
         alertDialog.show();
-    });
-    Ti.App.addEventListener("blurCheck", function(e) {
-        alert("blur");
-        Ti.API.info("here");
-        Ti.API.info(e.row);
-        Ti.API.info(e.row.fieldObject);
-        Ti.API.info(e.row.fieldObject.numeric_max);
-        var fieldObject = params.row.fieldObject;
-        var textField = arguments[0].row.textField;
-        if ("Integer" == fieldObject.field_type) if ("number" == typeof fieldObject.textField.value && 0 == fieldObject.textField.value % 1) {
-            if (textField.value > fieldObject.numeric_max || textField.value < fieldObject.numeric_min) {
-                var alertDialog = Ti.UI.createAlertDialog({
-                    title: "Invalid input",
-                    message: "The input must be in the range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]"
-                });
-                alertDialog.show();
-                textField.value = fieldObject.default_value;
-            }
-        } else {
-            var alertDialog = Ti.UI.createAlertDialog({
-                title: "Invalid input",
-                message: "The input must be an integer."
-            });
-            alertDialog.show();
-            textField.value = fieldObject.default_value;
-        }
     });
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
     _.extend($, exports);

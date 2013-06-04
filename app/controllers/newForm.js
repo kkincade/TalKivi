@@ -5,14 +5,24 @@ $.newFormWindow.title = formName; // Set title of window
 loadTemplate();
 
 function submitButtonClicked() {
-	alert('submit!');
+	var messageString = validateForm();
+	
+	if (messageString == "") {
+		var alertDialog = Ti.App.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
+		$.newFormWindow.close();
+	} else {
+		var alertDialog = Ti.App.createAlertDialog({ title: "Invalid Input", message: messageString });
+		alertDialog.show();
+	}
 }
+
 
 // When a template is selected,
 function loadTemplate(event) {
 	var template = Ti.App.Properties.getObject(formName);
 	formHandler.generateTemplate(template, $.tableView);
 }
+
 
 // Displays the help text when a user long presses on a row
 $.tableView.addEventListener('longpress', function(event) {
@@ -31,38 +41,121 @@ $.tableView.addEventListener('longpress', function(event) {
 	alertDialog.show();
 });
 
-Ti.App.addEventListener('blurCheck', function(e) {
-	alert("blur");
-	Ti.API.info("here");
-	Ti.API.info(e.row);
-	Ti.API.info(e.row.fieldObject);
-	Ti.API.info(e.row.fieldObject.numeric_max);
-	var fieldObject = params.row.fieldObject;
-	var textField = arguments[0].row.textField;
+
+// Loop over every row in table view and validate the contents
+function validateForm() {
 	
-	if (fieldObject.field_type == "Integer") {
-		if (typeof fieldObject.textField.value === 'number' && fieldObject.textField.value % 1 == 0) {
-			if (textField.value > fieldObject.numeric_max || textField.value < fieldObject.numeric_min) {
-				var alertDialog = Ti.UI.createAlertDialog({
-				title: "Invalid input",
-				message: "The input must be in the range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]"
-			});
-			alertDialog.show();
-			textField.value = fieldObject.default_value;
+	var messageString = ""; // Start with blank error message
+	
+	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
+		
+		var fieldObject = $.tableView.data[0].rows[i].fieldObject;
+		var value = getFieldValue($.tableView.data[0].rows[i]);
+		
+		// Checks if the field is blank and/or required
+		if (value == "" || value == null) {
+			if (fieldObject.required == "No") {
+				continue;
+			} else {
+				messageString += fieldObject.prompt + " is a required field.\n";
+				continue;
+			}
+		}
+
+		// -------------- Text ----------------
+ 		if (fieldObject.field_type == 'Text') {
+ 			// Do Nothing
+ 			
+ 		// -------------- Checkbox ----------------
+ 		} else if (fieldObject.field_type == 'Checkbox') { 
+ 			// Do Nothing	
+ 		
+ 		
+ 		// ------------ Integer ----------------
+ 		} else if (fieldObject.field_type == 'Integer') { 
+			// Is number? And is integer?
+			if (Number(value) > 0 && value % 1 == 0) {
+				// Is it in range?
+				if (value > fieldObject.numeric_max || value < fieldObject.numeric_min) {
+					messageString += fieldObject.prompt + " must be in range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]\n";
+				}
+			} else {
+				messageString += fieldObject.prompt + " must be an integer.\n";
+			}
+		
+		
+		// ------------ Decimal ----------------
+		} else if (fieldObject.field_type == 'Decimal') { 
+		    // Is number?
+			if (Number(value) > 0) {
+				// Is it in range?
+				if (value > fieldObject.numeric_max || value < fieldObject.numeric_min) {
+					messageString += fieldObject.prompt + " must be in range [" + fieldObject.numeric_min + ", " + fieldObject.numeric_max + "]\n";
+				}
+			} else {
+				messageString += fieldObject.prompt + " must be a number.\n";
 			}
 			
-		} else {
-			var alertDialog = Ti.UI.createAlertDialog({
-				title: "Invalid input",
-				message: "The input must be an integer."
-			});
-			alertDialog.show();
-			textField.value = fieldObject.default_value;
+			
+		// ---------- Calculated ------------
+		} else if (fieldObject.field_type == 'Calculated') { 
+		
+		
+		// -------------- Incremental Text ----------------
+		} else if (fieldObject.field_type == 'Incremental Text') { 
+		
+		
+		// -------------- Date ----------------
+		} else if (fieldObject.field_type == 'Date') { 
+		
+		
+		// -------------- Time ----------------
+		} else if (fieldObject.field_type == 'Time') { 
+			
+			
+		// -------------- Date-Time ----------------
+		} else if (fieldObject.field_type == 'Date-Time') { 
+		
+		} else if (fieldObject.field_type == 'Message') { 
+		
+		} else if (fieldObject.field_type == 'Location') { 
+		
+		} else if (fieldObject.field_type == 'Photo') { 
+		
+		} else if (fieldObject.field_type == 'Recording') { 
+		
+		} else if (fieldObject.field_type == 'Selection') { 
+		
+		} else if (fieldObject.field_type == 'Button Selection') { 
+		
+		} else if (fieldObject.field_type == 'Structural Attitude') { 
+		
+		} else { 
+			
 		}
+		//------------------------------------------------------------------------------------------------------------------------------------------
 	}
-});
+	return messageString;
+}
 
 
-function isInt(n) {
-   return typeof n === 'number' && n % 1 == 0;
+// Returns the value from the corresponding textField, switchers, etc. (Not all fields have textFields)
+function getFieldValue(tableViewRow) {
+	if (tableViewRow.fieldObject.field_type == 'Text') { return tableViewRow.textField.value } 
+	else if (tableViewRow.fieldObject.field_type == 'Checkbox') { return tableViewRow.switcher.value }
+	else if (tableViewRow.fieldObject.field_type == 'Integer') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Decimal') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Calculated') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Incremental Text') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Date') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Time') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Date-Time') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Message') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Location') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Photo') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Recording') { return tableViewRow.textField.value }
+	else if (tableViewRowfieldObject.field_type == 'Selection') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Button Selection') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Structural Attitude') { return tableViewRow.textField.value }
+	else { return tableViewRow.fieldObject.textField }
 }
