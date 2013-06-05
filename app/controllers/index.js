@@ -12,6 +12,10 @@ if (Ti.App.Properties.getList("settings") == null) {
 	Ti.App.Properties.setList("settings", []);
 }
 
+if (Ti.App.Properties.getInt("TDP_INCREMENT") == null) {
+	Ti.App.Properties.setInt("TDP_INCREMENT", 0);
+}
+
 // open index window
 $.index.open();
 

@@ -3,7 +3,6 @@ function Controller() {
         var templates = Ti.App.Properties.getList("activeTemplates");
         templates.splice(templates.indexOf(event.rowData.label.text), 1);
         Ti.App.Properties.setList("activeTemplates", templates);
-        Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
     }
     function addTemplatesButtonClicked() {
         $.downloadForms = Alloy.createController("downloadForms");

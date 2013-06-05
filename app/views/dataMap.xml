@@ -1,0 +1,4 @@
+<Alloy>
+	<View id="dataMapView" ns="Ti.Map" animate="true" regionFit="true" userLocation="true" mapType="Ti.Map.STANDARD_TYPE">
+	</View>	
+</Alloy>

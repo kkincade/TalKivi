@@ -8,14 +8,41 @@ function submitButtonClicked() {
 	var messageString = validateForm();
 	
 	if (messageString == "") {
-		var alertDialog = Ti.App.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
+		alertDialog.show();
+		submitForm();
 		$.newFormWindow.close();
 	} else {
-		var alertDialog = Ti.App.createAlertDialog({ title: "Invalid Input", message: messageString });
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
 		alertDialog.show();
 	}
 }
 
+
+function submitForm() {
+	var completedForms = Ti.App.Properties.getList("completedForms");
+	var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
+	
+	var form = {
+		TDP_id: "TDP_" + TDP_id,
+		formName: formName
+	};
+	
+	++TDP_id;
+	Ti.App.Properties.setInt("TDP_INCREMENT", TDP_id);
+	
+	tempFields = [];
+	// Construct the form object we are going to save
+	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
+		var value = getFieldValue($.tableView.data[0].rows[i]);
+		tempFields.push(value);
+	}
+	
+	form.fields = tempFields;
+	Ti.App.Properties.setObject(form.TDP_id, form);
+	completedForms.push(form.TDP_id);
+	Ti.App.Properties.setList("completedForms", completedForms);
+}
 
 // When a template is selected,
 function loadTemplate(event) {
@@ -154,7 +181,7 @@ function getFieldValue(tableViewRow) {
 	else if (tableViewRow.fieldObject.field_type == 'Location') { return tableViewRow.textField.value }
 	else if (tableViewRow.fieldObject.field_type == 'Photo') { return tableViewRow.textField.value }
 	else if (tableViewRow.fieldObject.field_type == 'Recording') { return tableViewRow.textField.value }
-	else if (tableViewRowfieldObject.field_type == 'Selection') { return tableViewRow.textField.value }
+	else if (tableViewRow.fieldObject.field_type == 'Selection') { return tableViewRow.textField.value }
 	else if (tableViewRow.fieldObject.field_type == 'Button Selection') { return tableViewRow.textField.value }
 	else if (tableViewRow.fieldObject.field_type == 'Structural Attitude') { return tableViewRow.textField.value }
 	else { return tableViewRow.fieldObject.textField }

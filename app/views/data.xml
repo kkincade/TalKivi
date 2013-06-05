@@ -1,7 +1,7 @@
 <Alloy>
 	<Tab id="dataTab" title="Data" icon="globe_green.png">
-		<Window id="dataWindow" title="Data">
-			<Label>Data</Label>
+		<Window id="dataWindow">
+	        
 		</Window>
 	</Tab>
 </Alloy>

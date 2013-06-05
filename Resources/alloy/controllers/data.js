@@ -5,14 +5,8 @@ function Controller() {
     var $ = this;
     var exports = {};
     $.__views.dataWindow = Ti.UI.createWindow({
-        id: "dataWindow",
-        title: "Data"
+        id: "dataWindow"
     });
-    $.__views.__alloyId0 = Ti.UI.createLabel({
-        text: "Data",
-        id: "__alloyId0"
-    });
-    $.__views.dataWindow.add($.__views.__alloyId0);
     $.__views.dataTab = Ti.UI.createTab({
         window: $.__views.dataWindow,
         id: "dataTab",
@@ -22,6 +16,21 @@ function Controller() {
     $.__views.dataTab && $.addTopLevelView($.__views.dataTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var tabbedBar = Ti.UI.iOS.createTabbedBar({
+        labels: [ "List", "Map" ],
+        index: 0,
+        top: 50,
+        style: Titanium.UI.iPhone.SystemButtonStyle.BAR,
+        height: 25,
+        width: 150
+    });
+    tabbedBar.addEventListener("click", function() {
+        if (0 == tabbedBar.index) $.dataList = Alloy.createController("dataList"); else {
+            var mapView = Alloy.createController("dataMap").getView();
+            $.dataWindow.add(mapView);
+        }
+    });
+    $.dataWindow.setTitleControl(tabbedBar);
     _.extend($, exports);
 }
 

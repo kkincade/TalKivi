@@ -32,6 +32,7 @@ function Controller() {
     null == Ti.App.Properties.getList("activeTemplates") && Ti.App.Properties.setList("activeTemplates", []);
     null == Ti.App.Properties.getList("completedForms") && Ti.App.Properties.setList("completedForms", []);
     null == Ti.App.Properties.getList("settings") && Ti.App.Properties.setList("settings", []);
+    null == Ti.App.Properties.getInt("TDP_INCREMENT") && Ti.App.Properties.setInt("TDP_INCREMENT", 0);
     $.index.open();
     _.extend($, exports);
 }

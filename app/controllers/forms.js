@@ -79,12 +79,11 @@ $.templatesTableView.addEventListener('longpress', function(event) {
 });
 
 
+// Deletes a template from local persistence
 function deleteTemplate(event) {
 	var templates = Ti.App.Properties.getList("activeTemplates");
 	templates.splice(templates.indexOf(event.rowData.label.text), 1);
 	Ti.App.Properties.setList("activeTemplates", templates);
-	Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
-	
 }
 
 

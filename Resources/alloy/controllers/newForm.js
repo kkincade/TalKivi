@@ -2,18 +2,39 @@ function Controller() {
     function submitButtonClicked() {
         var messageString = validateForm();
         if ("" == messageString) {
-            var alertDialog = Ti.App.createAlertDialog({
+            var alertDialog = Ti.UI.createAlertDialog({
                 title: "Success!",
                 message: "Form submitted successfully"
             });
+            alertDialog.show();
+            submitForm();
             $.newFormWindow.close();
         } else {
-            var alertDialog = Ti.App.createAlertDialog({
+            var alertDialog = Ti.UI.createAlertDialog({
                 title: "Invalid Input",
                 message: messageString
             });
             alertDialog.show();
         }
+    }
+    function submitForm() {
+        var completedForms = Ti.App.Properties.getList("completedForms");
+        var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
+        var form = {
+            TDP_id: "TDP_" + TDP_id,
+            formName: formName
+        };
+        ++TDP_id;
+        Ti.App.Properties.setInt("TDP_INCREMENT", TDP_id);
+        tempFields = [];
+        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
+            var value = getFieldValue($.tableView.data[0].rows[i]);
+            tempFields.push(value);
+        }
+        form.fields = tempFields;
+        Ti.App.Properties.setObject(form.TDP_id, form);
+        completedForms.push(form.TDP_id);
+        Ti.App.Properties.setList("completedForms", completedForms);
     }
     function loadTemplate() {
         var template = Ti.App.Properties.getObject(formName);
@@ -34,7 +55,7 @@ function Controller() {
         return messageString;
     }
     function getFieldValue(tableViewRow) {
-        return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRowfieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
+        return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;

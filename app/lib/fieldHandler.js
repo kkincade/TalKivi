@@ -36,7 +36,7 @@ function TextField(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	})
@@ -97,7 +97,7 @@ function Integer(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -131,7 +131,7 @@ function Decimal(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -165,7 +165,7 @@ function Calculated(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -198,7 +198,7 @@ function Incremental_Text(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -231,7 +231,7 @@ function DateField(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -264,7 +264,7 @@ function Time(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -297,7 +297,7 @@ function Date_Time(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -330,7 +330,7 @@ function Message(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -363,7 +363,7 @@ function LocationField(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -396,7 +396,7 @@ function Photo(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -429,7 +429,7 @@ function Recording(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -462,7 +462,7 @@ function Selection(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -495,7 +495,7 @@ function Button_Selection(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -528,7 +528,7 @@ function Structural_Attitude(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -560,7 +560,7 @@ function unknownField(fieldObject) {
 		width: Ti.UI.FILL,
 		height: Ti.UI.SIZE,
 		top: '10dp', 
-		left: '30dp',
+		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
 	});
@@ -584,9 +584,9 @@ function unknownField(fieldObject) {
 function checkLabelLength(tableViewRow) {
 	var length = tableViewRow.title.length;
 	
-	if (length > 30) {
-		tableViewRow.font = { fontSize: '8dp', fontWeight: 'bold' };
-	} else if (length > 20) {
+	if (length > 25) {
+		tableViewRow.font = { fontSize: '10dp', fontWeight: 'bold' };
+	} else if (length > 15) {
 		tableViewRow.font = { fontSize: '12dp', fontWeight: 'bold' };
 	} else if (length > 10) {
 		tableViewRow.font = { fontSize: '16dp', fontWeight: 'bold' };
