@@ -13,6 +13,7 @@ function doneButtonClicked() {
 	Ti.App.fireEvent('populateTemplates');
 }
 
+
 // Android uses the back button instead of the done button
 $.downloadTemplatesWindow.addEventListener('androidback', function(event) { 
 	$.downloadTemplatesWindow.close();
@@ -64,7 +65,6 @@ function loadTemplates() {
 				singleTemplate.selectedColor = 'white';
 				singleTemplate.backgroundSelectedColor = 'white';
 			}
-			
 			// Load singe template into array
 			singleTemplate.add(label);
 			templates.push(singleTemplate);

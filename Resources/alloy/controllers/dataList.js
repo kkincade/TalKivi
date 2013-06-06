@@ -8,7 +8,7 @@ function Controller() {
                 text: completedForms[i],
                 color: "black"
             });
-            var singleTemplate = Ti.UI.createTableViewRow({
+            var formTableViewRow = Ti.UI.createTableViewRow({
                 id: i,
                 label: label,
                 height: "40dp",
@@ -16,8 +16,8 @@ function Controller() {
                 hasDetail: true,
                 backgroundSelectedColor: "gray"
             });
-            singleTemplate.add(label);
-            formsToDisplay.push(singleTemplate);
+            formTableViewRow.add(label);
+            formsToDisplay.push(formTableViewRow);
         }
         $.completedFormsTableView.data = formsToDisplay;
         $.completedFormsTableView.editable = true;
@@ -41,6 +41,8 @@ function Controller() {
     _.extend($, $.__views);
     $.dataListWindow.open();
     loadFormsIntoList();
+    $.completedFormsTableView.addEventListener("longpress", function(event) {
+    });
     _.extend($, exports);
 }
 

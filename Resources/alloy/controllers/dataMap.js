@@ -4,9 +4,9 @@ function Controller() {
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
-    var __alloyId0 = [];
+    var __alloyId1 = [];
     $.__views.dataMapView = Ti.Map.createView({
-        annotations: __alloyId0,
+        annotations: __alloyId1,
         id: "dataMapView",
         ns: Ti.Map,
         animate: "true",

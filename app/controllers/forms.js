@@ -1,7 +1,3 @@
-function initialize() {
-	
-}
-
 
 Ti.App.addEventListener('populateTemplates', function() {
 	var activeTemplates = Ti.App.Properties.getList("activeTemplates");
@@ -30,12 +26,10 @@ Ti.App.addEventListener('populateTemplates', function() {
 			singleTemplate.backgroundColor = 'black';
 			singleTemplate.hasChild = true;
 		}
-		
 		// Load singe template into array
 		singleTemplate.add(label);
 		templates.push(singleTemplate);		
 	}
-
 	// Load templates into TableView
 	$.templatesTableView.data = templates;
 	$.templatesTableView.editable = true;
@@ -45,7 +39,6 @@ Ti.App.addEventListener('populateTemplates', function() {
 
 // Creates a newForm window when a form is clicked
 $.templatesTableView.addEventListener('click', function(event) {
-	//Ti.App.Properties.setString("formNameParameter", event.rowData.label.text);
 	var controller = Alloy.createController('newForm', { formName: event.rowData.label.text }).getView();
 	$.formsTab.open(controller);
 });
@@ -57,7 +50,7 @@ $.templatesTableView.addEventListener('delete', function(event) {
 });
 
 
-// ANDROID event listener for deleting rows (forms)
+// ANDROID event listener for deleting rows (templates)
 $.templatesTableView.addEventListener('longpress', function(event) {
 	if (OS_ANDROID) {
 		// If they long press on a row, create an alert dialog asking if they want to delete the form
@@ -72,7 +65,6 @@ $.templatesTableView.addEventListener('longpress', function(event) {
 					// Do nothing
 				}	
 			});
-			
 			dialog.show();
 		}
 	}
@@ -87,6 +79,7 @@ function deleteTemplate(event) {
 }
 
 
+// Callback method for clicking the "Add" button
 function addTemplatesButtonClicked() {
 	$.downloadForms = Alloy.createController('downloadForms');
 }

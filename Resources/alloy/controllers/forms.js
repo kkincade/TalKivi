@@ -90,7 +90,7 @@ function Controller() {
     });
     __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] && $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked);
     __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] && $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked);
-    __defers["$.__views.__alloyId6!click!addTemplatesButtonClicked"] && $.__views.__alloyId6.addEventListener("click", addTemplatesButtonClicked);
+    __defers["$.__views.__alloyId7!click!addTemplatesButtonClicked"] && $.__views.__alloyId7.addEventListener("click", addTemplatesButtonClicked);
     _.extend($, exports);
 }
 
