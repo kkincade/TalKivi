@@ -7,32 +7,32 @@ function Controller() {
     $.__views.index = Ti.UI.createTabGroup({
         id: "index"
     });
-    $.__views.__alloyId10 = Alloy.createController("forms", {
+    $.__views.__alloyId9 = Alloy.createController("forms", {
+        id: "__alloyId9"
+    });
+    $.__views.index.addTab($.__views.__alloyId9.getViewEx({
+        recurse: true
+    }));
+    $.__views.__alloyId10 = Alloy.createController("data", {
         id: "__alloyId10"
     });
     $.__views.index.addTab($.__views.__alloyId10.getViewEx({
         recurse: true
     }));
-    $.__views.__alloyId11 = Alloy.createController("data", {
+    $.__views.__alloyId11 = Alloy.createController("settings", {
         id: "__alloyId11"
     });
     $.__views.index.addTab($.__views.__alloyId11.getViewEx({
         recurse: true
     }));
-    $.__views.__alloyId12 = Alloy.createController("settings", {
-        id: "__alloyId12"
-    });
-    $.__views.index.addTab($.__views.__alloyId12.getViewEx({
-        recurse: true
-    }));
     $.__views.index && $.addTopLevelView($.__views.index);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    Ti.App.Properties.removeProperty("activeTemplates");
     null == Ti.App.Properties.getList("activeTemplates") && Ti.App.Properties.setList("activeTemplates", []);
     null == Ti.App.Properties.getList("completedForms") && Ti.App.Properties.setList("completedForms", []);
     null == Ti.App.Properties.getList("settings") && Ti.App.Properties.setList("settings", []);
     null == Ti.App.Properties.getInt("TDP_INCREMENT") && Ti.App.Properties.setInt("TDP_INCREMENT", 0);
+    Ti.App.fireEvent("populateTemplates");
     $.index.open();
     _.extend($, exports);
 }

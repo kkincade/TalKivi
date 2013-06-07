@@ -8,6 +8,10 @@ exports.generateTemplate = function(data, tableView) {
 	if (talkiviFormItemSet != null) {
 		for (var i = 0; i < talkiviFormItemSet.length; ++i) {
 			var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
+			if (OS_ANDROID) {
+				tableViewRow.backgroundColor = 'black';
+				tableViewRow.color = 'white';
+			}
 			tableViewRows.push(tableViewRow);
 		}
 		tableView.data = tableViewRows;

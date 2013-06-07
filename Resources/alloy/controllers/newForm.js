@@ -68,17 +68,19 @@ function Controller() {
         id: "newFormWindow"
     });
     $.__views.newFormWindow && $.addTopLevelView($.__views.newFormWindow);
-    $.__views.submitButton = Ti.UI.createButton({
-        id: "submitButton",
-        title: "Submit",
-        style: Ti.UI.iPhone.SystemButtonStyle.DONE
-    });
-    submitButtonClicked ? $.__views.submitButton.addEventListener("click", submitButtonClicked) : __defers["$.__views.submitButton!click!submitButtonClicked"] = true;
-    $.__views.newFormWindow.rightNavButton = $.__views.submitButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.newFormWindow.add($.__views.tableView);
+    $.__views.newFormWindow.activity.onCreateOptionsMenu = function(e) {
+        var __alloyId16 = {
+            title: "Submit Form",
+            id: "__alloyId15"
+        };
+        $.__views.__alloyId15 = e.menu.add(_.pick(__alloyId16, Alloy.Android.menuItemCreateArgs));
+        $.__views.__alloyId15.applyProperties(_.omit(__alloyId16, Alloy.Android.menuItemCreateArgs));
+        submitFormButtonClicked ? $.__views.__alloyId15.addEventListener("click", submitFormButtonClicked) : __defers["$.__views.__alloyId15!click!submitFormButtonClicked"] = true;
+    };
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");
@@ -95,7 +97,12 @@ function Controller() {
         });
         alertDialog.show();
     });
+    $.tableView.addEventListener("androidback", function() {
+        $.newFormWindow.close();
+        Ti.App.fireEvent("populateTemplates");
+    });
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
+    __defers["$.__views.__alloyId15!click!submitFormButtonClicked"] && $.__views.__alloyId15.addEventListener("click", submitFormButtonClicked);
     _.extend($, exports);
 }
 

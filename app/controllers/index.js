@@ -1,4 +1,4 @@
-Ti.App.Properties.removeProperty("activeTemplates");
+// Ti.App.Properties.removeProperty("activeTemplates");
 // Setup persistence for downloaded forms (The only time these are null is on the first launch of the application)
 if (Ti.App.Properties.getList("activeTemplates") == null) {
 	Ti.App.Properties.setList("activeTemplates", []);
@@ -17,6 +17,7 @@ if (Ti.App.Properties.getInt("TDP_INCREMENT") == null) {
 }
 
 // open index window
+Ti.App.fireEvent('populateTemplates');
 $.index.open();
 
 // Hand written JSON's

@@ -4,6 +4,8 @@
 	        <LeftNavButton platform='ios'>
 				<Button id="editFormsButton" title="Edit" onClick="editFormsButtonClicked"/>
 			</LeftNavButton>
+			<!-- <View id="mapView" ns="Ti.Map" animate="true" regionFit="true" userLocation="true" visible="false" mapType="Ti.Map.STANDARD_TYPE"/> -->
+			<TableView id="completedFormsTableView">
 		</Window>
 	</Tab>
 </Alloy>

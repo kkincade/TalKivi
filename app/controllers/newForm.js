@@ -68,6 +68,13 @@ $.tableView.addEventListener('longpress', function(event) {
 	alertDialog.show();
 });
 
+// Android uses the back button instead of the done button
+$.tableView.addEventListener('androidback', function(event) { 
+	//TODO: warn user before closing (also do this for iOS)
+	$.newFormWindow.close();
+	Ti.App.fireEvent('populateTemplates');
+});
+
 
 // Loop over every row in table view and validate the contents
 function validateForm() {

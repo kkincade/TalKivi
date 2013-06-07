@@ -1,5 +1,0 @@
-<Alloy>
-	<Window id="dataListWindow" class="container">
-		<TableView id="completedFormsTableView">
-	</Window>
-</Alloy>

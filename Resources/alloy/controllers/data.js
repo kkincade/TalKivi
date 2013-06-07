@@ -1,13 +1,37 @@
 function Controller() {
-    function editFormsButtonClicked() {
-        if (listView.completedFormsTableView.editing) {
-            $.editFormsButton.title = "Edit";
-            listView.completedFormsTableView.editing = false;
-        } else if (listView.completedFormsTableView.sections.length > 0) {
-            $.editFormsButton.title = "Done";
-            listView.completedFromsTableView.editing = true;
+    function loadFormsIntoList() {
+        var completedForms = Ti.App.Properties.getList("completedForms");
+        var formsToDisplay = [];
+        for (var i = 0; completedForms.length > i; ++i) {
+            var label = Ti.UI.createLabel({
+                id: i,
+                text: completedForms[i],
+                color: "black"
+            });
+            var formTableViewRow = Ti.UI.createTableViewRow({
+                id: i,
+                label: label,
+                height: "40dp",
+                backgroundColor: "white",
+                hasDetail: true,
+                backgroundSelectedColor: "gray"
+            });
+            formTableViewRow.label.color = "white";
+            formTableViewRow.backgroundColor = "black";
+            formTableViewRow.hasChild = true;
+            formTableViewRow.add(label);
+            formsToDisplay.push(formTableViewRow);
         }
+        $.completedFormsTableView.data = formsToDisplay;
+        $.completedFormsTableView.editable = true;
+        $.completedFormsTableView.moveable = true;
     }
+    function deleteForm(event) {
+        var forms = Ti.App.Properties.getList("completedForms");
+        forms.splice(forms.indexOf(event.rowData.label.text), 1);
+        Ti.App.Properties.setList("completedForms", forms);
+    }
+    function editFormsButtonClicked() {}
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
@@ -17,12 +41,10 @@ function Controller() {
     $.__views.dataWindow = Ti.UI.createWindow({
         id: "dataWindow"
     });
-    $.__views.editFormsButton = Ti.UI.createButton({
-        id: "editFormsButton",
-        title: "Edit"
+    $.__views.completedFormsTableView = Ti.UI.createTableView({
+        id: "completedFormsTableView"
     });
-    editFormsButtonClicked ? $.__views.editFormsButton.addEventListener("click", editFormsButtonClicked) : __defers["$.__views.editFormsButton!click!editFormsButtonClicked"] = true;
-    $.__views.dataWindow.leftNavButton = $.__views.editFormsButton;
+    $.__views.dataWindow.add($.__views.completedFormsTableView);
     $.__views.dataTab = Ti.UI.createTab({
         window: $.__views.dataWindow,
         id: "dataTab",
@@ -32,29 +54,26 @@ function Controller() {
     $.__views.dataTab && $.addTopLevelView($.__views.dataTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var listView = Alloy.createController("dataList").getView();
-    var mapView = Alloy.createController("dataMap").getView();
-    $.dataWindow.add(listView);
-    $.dataWindow.add(mapView);
-    mapView.hide();
-    var tabbedBar = Ti.UI.iOS.createTabbedBar({
-        labels: [ "List", "Map" ],
-        index: 0,
-        top: 50,
-        style: Titanium.UI.iPhone.SystemButtonStyle.BAR,
-        height: 25,
-        width: 150
+    loadFormsIntoList();
+    $.completedFormsTableView.show();
+    $.completedFormsTableView.addEventListener("delete", function(event) {
+        deleteForm(event);
     });
-    tabbedBar.addEventListener("click", function() {
-        if (0 == tabbedBar.index) {
-            listView.show();
-            mapView.hide();
-        } else {
-            listView.hide();
-            mapView.show();
+    $.completedFormsTableView.addEventListener("longpress", function(event) {
+        if (null != event.rowData) {
+            var dialog = Ti.UI.createAlertDialog({
+                message: "Delete " + event.rowData.label.text + "?",
+                buttonNames: [ "Delete", "Cancel" ]
+            });
+            dialog.addEventListener("click", function(e) {
+                if (0 == e.index) {
+                    deleteForm(event);
+                    loadFormsIntoList();
+                }
+            });
+            dialog.show();
         }
     });
-    $.dataWindow.setTitleControl(tabbedBar);
     __defers["$.__views.editFormsButton!click!editFormsButtonClicked"] && $.__views.editFormsButton.addEventListener("click", editFormsButtonClicked);
     _.extend($, exports);
 }

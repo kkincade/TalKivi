@@ -7,17 +7,7 @@ function Controller() {
     function addTemplatesButtonClicked() {
         $.downloadForms = Alloy.createController("downloadForms");
     }
-    function editTemplatesButtonClicked() {
-        if ($.templatesTableView.editing) {
-            $.editTemplatesButton.title = "Edit";
-            $.addTemplatesButton.enabled = true;
-            $.templatesTableView.editing = false;
-        } else if ($.templatesTableView.sections.length > 0) {
-            $.editTemplatesButton.title = "Done";
-            $.addTemplatesButton.enabled = false;
-            $.templatesTableView.editing = true;
-        }
-    }
+    function editTemplatesButtonClicked() {}
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
@@ -28,22 +18,19 @@ function Controller() {
         id: "navGroupWindow",
         title: "Forms"
     });
-    $.__views.addTemplatesButton = Ti.UI.createButton({
-        id: "addTemplatesButton",
-        title: "Add"
-    });
-    addTemplatesButtonClicked ? $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked) : __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] = true;
-    $.__views.navGroupWindow.rightNavButton = $.__views.addTemplatesButton;
-    $.__views.editTemplatesButton = Ti.UI.createButton({
-        id: "editTemplatesButton",
-        title: "Edit"
-    });
-    editTemplatesButtonClicked ? $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked) : __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] = true;
-    $.__views.navGroupWindow.leftNavButton = $.__views.editTemplatesButton;
     $.__views.templatesTableView = Ti.UI.createTableView({
         id: "templatesTableView"
     });
     $.__views.navGroupWindow.add($.__views.templatesTableView);
+    $.__views.navGroupWindow.activity.onCreateOptionsMenu = function(e) {
+        var __alloyId7 = {
+            title: "Download Forms",
+            id: "__alloyId6"
+        };
+        $.__views.__alloyId6 = e.menu.add(_.pick(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        $.__views.__alloyId6.applyProperties(_.omit(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        addTemplatesButtonClicked ? $.__views.__alloyId6.addEventListener("click", addTemplatesButtonClicked) : __defers["$.__views.__alloyId6!click!addTemplatesButtonClicked"] = true;
+    };
     $.__views.formsTab = Ti.UI.createTab({
         window: $.__views.navGroupWindow,
         id: "formsTab",
@@ -70,6 +57,9 @@ function Controller() {
                 hasDetail: true,
                 backgroundSelectedColor: "gray"
             });
+            singleTemplate.label.color = "white";
+            singleTemplate.backgroundColor = "black";
+            singleTemplate.hasChild = true;
             singleTemplate.add(label);
             templates.push(singleTemplate);
         }
@@ -87,10 +77,23 @@ function Controller() {
         deleteTemplate(event);
     });
     $.templatesTableView.addEventListener("longpress", function(event) {
+        if (null != event.rowData) {
+            var dialog = Ti.UI.createAlertDialog({
+                message: "Delete " + event.rowData.label.text + "?",
+                buttonNames: [ "Delete", "Cancel" ]
+            });
+            dialog.addEventListener("click", function(e) {
+                if (0 == e.index) {
+                    deleteTemplate(event);
+                    Ti.App.fireEvent("populateTemplates");
+                }
+            });
+            dialog.show();
+        }
     });
     __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] && $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked);
     __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] && $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked);
-    __defers["$.__views.__alloyId7!click!addTemplatesButtonClicked"] && $.__views.__alloyId7.addEventListener("click", addTemplatesButtonClicked);
+    __defers["$.__views.__alloyId6!click!addTemplatesButtonClicked"] && $.__views.__alloyId6.addEventListener("click", addTemplatesButtonClicked);
     _.extend($, exports);
 }
 
