@@ -3,9 +3,22 @@ function generateFieldView(fieldObject) {
 }
 
 function TextField(fieldObject) {
-    var textField = Ti.UI.createTextField({});
+    var textField = Ti.UI.createTextField({
+        borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+        value: fieldObject.default_value,
+        clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+        hintText: fieldObject.description,
+        width: Ti.UI.FILL,
+        height: Ti.UI.SIZE,
+        top: "10dp",
+        left: "150dp",
+        right: "10dp",
+        bottom: "10dp"
+    });
     var self = Ti.UI.createTableViewRow({
         fieldObject: fieldObject,
+        textField: textField,
         title: fieldObject.prompt,
         font: {
             fontSize: "16dp",

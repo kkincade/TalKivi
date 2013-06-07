@@ -25,25 +25,25 @@ function generateFieldView(fieldObject) {
 
 function TextField(fieldObject) {
 	
-	// var textField = Ti.UI.createTextField({
-		// borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
-		// textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		// value: fieldObject.default_value,
-		// clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
-		// hintText: fieldObject.description,
-// 		
-		// // Padding
-		// width: Ti.UI.FILL,
-		// height: Ti.UI.SIZE,
-		// top: '10dp', 
-		// left: '150dp',
-		// right: '10dp',
-		// bottom: '10dp'
-	// });
-	
 	var textField = Ti.UI.createTextField({
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
+		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+		value: fieldObject.default_value,
+		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
+		hintText: fieldObject.description,
 		
+		// Padding
+		width: Ti.UI.FILL,
+		height: Ti.UI.SIZE,
+		top: '10dp', 
+		left: '150dp',
+		right: '10dp',
+		bottom: '10dp'
 	});
+	
+	// var textField = Ti.UI.createTextField({
+// 		
+	// });
 	
 	// if (OS_ANDROID) {
 		// var label = Ti.UI.createLabel({
@@ -54,7 +54,7 @@ function TextField(fieldObject) {
 // 	
 	var self = Ti.UI.createTableViewRow({
 		fieldObject: fieldObject,
-		// textField: textField,
+		textField: textField,
 		title: fieldObject.prompt,
 		font: {
 			fontSize: '16dp',

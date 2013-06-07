@@ -1,6 +1,7 @@
+//Ti.App.fireEvent('loadFormsIntoList');
 loadFormsIntoList();
 
-// $.mapView.hide();
+$.mapView.hide();
 $.completedFormsTableView.show();
 
 if (OS_IOS) {
@@ -21,20 +22,28 @@ if (OS_IOS) {
 }
 
 
-// function toggleView() {
-	// if ($.mapView.visible) {
-		// $.completedFormsTableView.show();
-		// $.mapView.hide();
-	// } else {
-		// $.completedFormsTableView.hide();
-		// $.mapView.show();
-	// }
-// }
+function toggleView() {
+	if ($.mapView.visible) {
+		$.completedFormsTableView.show();
+		$.mapView.hide();
+	} else {
+		$.completedFormsTableView.hide();
+		$.mapView.show();
+	}
+}
 
 
-//----------------------------------------------------------------------
+// Creates an editForm window when a form is clicked
+$.completedFormsTableView.addEventListener('click', function(event) {
+	Ti.API.info("Parameter " + event.rowData.label.text);
+	var controller = Alloy.createController('editForm', { formID: event.rowData.label.text }).getView();
+	$.dataTab.open(controller);
+});
 
+
+//Ti.App.addEventListener('loadFormsIntoList', function() {
 function loadFormsIntoList() {
+	Ti.API.info("INNNNNN");
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var formsToDisplay = []
 	
@@ -70,11 +79,14 @@ function loadFormsIntoList() {
 	$.completedFormsTableView.editable = true;
 	$.completedFormsTableView.moveable = true;
 }
+//});
 
 
 // IOS event listener for delete button on iOS when deleting forms
 $.completedFormsTableView.addEventListener('delete', function(event) {
 	deleteForm(event);
+	loadFormsIntoList();
+	//Ti.App.fireEvent('loadFormsIntoList');
 });
 
 
@@ -89,6 +101,7 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 				if (e.index == 0) { // Delete
 					deleteForm(event);
 					loadFormsIntoList();
+					//Ti.App.fireEvent('loadFormsIntoList');
 				} else {
 					// Do nothing
 				}	

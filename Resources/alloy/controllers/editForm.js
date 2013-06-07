@@ -1,14 +1,14 @@
 function Controller() {
-    function submitButtonClicked() {
+    function saveButtonClicked() {
         var messageString = validateForm();
         if ("" == messageString) {
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Success!",
-                message: "Form submitted successfully"
+                message: "Form saved successfully"
             });
             alertDialog.show();
-            submitForm();
-            $.newFormWindow.close();
+            saveForm();
+            $.editFormWindow.close();
         } else {
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Invalid Input",
@@ -17,16 +17,9 @@ function Controller() {
             alertDialog.show();
         }
     }
-    function submitForm() {
+    function saveForm() {
         var completedForms = Ti.App.Properties.getList("completedForms");
-        var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
-        var form = {
-            TDP_id: "TDP_" + TDP_id,
-            formName: formName,
-            synced: false
-        };
-        ++TDP_id;
-        Ti.App.Properties.setInt("TDP_INCREMENT", TDP_id);
+        var form = Ti.App.Properties.getObject(formID);
         tempFields = [];
         for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
             var value = getFieldValue($.tableView.data[0].rows[i]);
@@ -38,14 +31,23 @@ function Controller() {
         Ti.App.Properties.setList("completedForms", completedForms);
     }
     function loadTemplate() {
-        var template = Ti.App.Properties.getObject(formName);
+        var form = Ti.App.Properties.getObject(formID);
+        var template = Ti.App.Properties.getObject(form.formName);
         formHandler.generateTemplate(template, $.tableView);
+        Ti.API.info($.tableView.data[0].rows.length);
+        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
+            Ti.API.info("Value: " + value);
+            Ti.API.info("Row: " + $.tableView.data[0].rows[i]);
+            var value = form.fields[i];
+            setFieldValue($.tableView.data[0].rows[i], value);
+        }
     }
     function validateForm() {
         var messageString = "";
         for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
             var fieldObject = $.tableView.data[0].rows[i].fieldObject;
             var value = getFieldValue($.tableView.data[0].rows[i]);
+            if ("Checkbox" == fieldObject.field_type) continue;
             if ("" == value || null == value) {
                 if ("No" == fieldObject.required) continue;
                 messageString += fieldObject.prompt + " is a required field.\n";
@@ -58,33 +60,36 @@ function Controller() {
     function getFieldValue(tableViewRow) {
         return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
     }
+    function setFieldValue(tableViewRow, value) {
+        "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value = value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : tableViewRow.fieldObject.textField = value;
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
     var __defers = {};
-    $.__views.newFormWindow = Ti.UI.createWindow({
+    $.__views.editFormWindow = Ti.UI.createWindow({
         backgroundColor: "white",
-        id: "newFormWindow"
+        id: "editFormWindow"
     });
-    $.__views.newFormWindow && $.addTopLevelView($.__views.newFormWindow);
-    $.__views.submitButton = Ti.UI.createButton({
-        id: "submitButton",
-        title: "Submit",
+    $.__views.editFormWindow && $.addTopLevelView($.__views.editFormWindow);
+    $.__views.saveButton = Ti.UI.createButton({
+        id: "saveButton",
+        title: "Save",
         style: Ti.UI.iPhone.SystemButtonStyle.DONE
     });
-    submitButtonClicked ? $.__views.submitButton.addEventListener("click", submitButtonClicked) : __defers["$.__views.submitButton!click!submitButtonClicked"] = true;
-    $.__views.newFormWindow.rightNavButton = $.__views.submitButton;
+    saveButtonClicked ? $.__views.saveButton.addEventListener("click", saveButtonClicked) : __defers["$.__views.saveButton!click!saveButtonClicked"] = true;
+    $.__views.editFormWindow.rightNavButton = $.__views.saveButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
-    $.__views.newFormWindow.add($.__views.tableView);
+    $.__views.editFormWindow.add($.__views.tableView);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");
-    var formName = arguments[0].formName;
-    $.newFormWindow.title = formName;
+    var formID = arguments[0].formID;
+    $.editFormWindow.title = formID;
     loadTemplate();
     $.tableView.addEventListener("longpress", function(event) {
         if ("" != event.rowData.fieldObject.help_text) var alertDialog = Ti.UI.createAlertDialog({
@@ -97,11 +102,11 @@ function Controller() {
         alertDialog.show();
     });
     $.tableView.addEventListener("androidback", function() {
-        $.newFormWindow.close();
+        $.editFormWindow.close();
         Ti.App.fireEvent("populateTemplates");
     });
-    __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
-    __defers["$.__views.__alloyId21!click!submitFormButtonClicked"] && $.__views.__alloyId21.addEventListener("click", submitFormButtonClicked);
+    __defers["$.__views.saveButton!click!saveButtonClicked"] && $.__views.saveButton.addEventListener("click", saveButtonClicked);
+    __defers["$.__views.__alloyId6!click!submitFormButtonClicked"] && $.__views.__alloyId6.addEventListener("click", submitFormButtonClicked);
     _.extend($, exports);
 }
 

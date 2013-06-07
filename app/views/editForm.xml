@@ -1,0 +1,13 @@
+<Alloy>
+	<Window id="editFormWindow" class="container">		
+		<RightNavButton platform='ios'>
+			<Button id="saveButton" title="Save" style="Ti.UI.iPhone.SystemButtonStyle.DONE" onClick="saveButtonClicked"/>
+		</RightNavButton>
+		
+		<TableView id="tableView"/>
+			
+		<Menu platform='android'>
+			<MenuItem title='Save Form' onClick="submitFormButtonClicked"/>
+		</Menu>
+	</Window>
+</Alloy>
