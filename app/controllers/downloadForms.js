@@ -105,9 +105,6 @@ function downloadTemplate(event) {
 		var tempTemplates = Ti.App.Properties.getList("activeTemplates");
 		tempTemplates.push(templateFromJSON.name); // We might add "Template" to make sure we aren't confusing template names with properties
 		Ti.App.Properties.setList("activeTemplates", tempTemplates);
-		
-		// TODO: Delete this when not needed anymore
-		Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
 	}
 	
 	var templateAPI = 'http://www.talkivi.org/talkivi-server/ws/form?rowid=' + event.rowData.rowID + '&format=JSON';

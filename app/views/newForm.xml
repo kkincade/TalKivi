@@ -1,13 +1,9 @@
 <Alloy>
-	<Window id="newFormWindow" class="container">		
+	<Window id="newFormWindow" class="container">	
 		<RightNavButton platform='ios'>
 			<Button id="submitButton" title="Submit" style="Ti.UI.iPhone.SystemButtonStyle.DONE" onClick="submitButtonClicked"/>
-		</RightNavButton>
-		
+		</RightNavButton>	
 		<TableView id="tableView"/>
-			
-		<Menu platform='android'>
-			<MenuItem title='Submit Form' onClick="submitFormButtonClicked"/>
-		</Menu>
+		<Button id="submitButton" platform='android' title='Submit Form' onClick="submitButtonClicked"/>
 	</Window>
 </Alloy>

@@ -27,17 +27,14 @@ function Controller() {
         }
         form.fields = tempFields;
         Ti.App.Properties.setObject(form.TDP_id, form);
-        completedForms.push(form.TDP_id);
+        -1 == completedForms.indexOf(formID) && completedForms.push(form.TDP_id);
         Ti.App.Properties.setList("completedForms", completedForms);
     }
     function loadTemplate() {
         var form = Ti.App.Properties.getObject(formID);
         var template = Ti.App.Properties.getObject(form.formName);
         formHandler.generateTemplate(template, $.tableView);
-        Ti.API.info($.tableView.data[0].rows.length);
         for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
-            Ti.API.info("Value: " + value);
-            Ti.API.info("Row: " + $.tableView.data[0].rows[i]);
             var value = form.fields[i];
             setFieldValue($.tableView.data[0].rows[i], value);
         }
@@ -74,17 +71,19 @@ function Controller() {
         id: "editFormWindow"
     });
     $.__views.editFormWindow && $.addTopLevelView($.__views.editFormWindow);
-    $.__views.saveButton = Ti.UI.createButton({
-        id: "saveButton",
-        title: "Save",
-        style: Ti.UI.iPhone.SystemButtonStyle.DONE
-    });
-    saveButtonClicked ? $.__views.saveButton.addEventListener("click", saveButtonClicked) : __defers["$.__views.saveButton!click!saveButtonClicked"] = true;
-    $.__views.editFormWindow.rightNavButton = $.__views.saveButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.editFormWindow.add($.__views.tableView);
+    $.__views.editFormWindow.activity.onCreateOptionsMenu = function(e) {
+        var __alloyId7 = {
+            title: "Save Form",
+            id: "__alloyId6"
+        };
+        $.__views.__alloyId6 = e.menu.add(_.pick(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        $.__views.__alloyId6.applyProperties(_.omit(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        submitFormButtonClicked ? $.__views.__alloyId6.addEventListener("click", submitFormButtonClicked) : __defers["$.__views.__alloyId6!click!submitFormButtonClicked"] = true;
+    };
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");

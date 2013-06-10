@@ -1,9 +1,7 @@
-//Ti.App.fireEvent('loadFormsIntoList');
 loadFormsIntoList();
+$.mapView.visible = false;
 
-$.mapView.hide();
-$.completedFormsTableView.show();
-
+// iOS
 if (OS_IOS) {
 	var tabbedBar = Ti.UI.iOS.createTabbedBar({
 		labels: ['List', 'Map'],
@@ -19,32 +17,104 @@ if (OS_IOS) {
 	});
 	
 	$.dataWindow.setTitleControl(tabbedBar);
+	
+// Android
+} else {
+	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth*0.5);
+	var width = spacer-4;
+	var height = 36;
+	 
+	var win = Ti.UI.createWindow({
+	    backgroundColor:'#FFF'
+	});
+ 
+	// TAB BAR
+	var tabBar = Ti.UI.createView({
+	    width:Ti.Platform.displayCaps.platformWidth,
+	    height:40,
+	    left:0,
+	    bottom:0,
+	    backgroundColor:'transparent'
+	});
+	$.dataWindow.add(tabBar);
+	// TAB 1
+	var tab1 = Ti.UI.createView({
+	    width:width,
+	    height:height,
+	    left:2,
+	    bottom:2,
+	    backgroundColor:'#333',
+	    borderRadius:2
+	});
+	var tab1Label = Ti.UI.createLabel({
+	    text:'List View',
+	    color:'#FFF'
+	});
+	tab1.add(tab1Label);
+	$.dataWindow.add(tab1);
+	// TAB 2
+	var tab2 = Ti.UI.createView({
+	    width:width,
+	    height:height,
+	    left:spacer,
+	    bottom:2,
+	    backgroundColor:'#000'
+	});
+	var tab2Label = Ti.UI.createLabel({
+	    text:'Map View',
+	    color:'#777'
+	});
+	tab2.add(tab2Label);
+	$.dataWindow.add(tab2);
+	 
+	var currTab = tab1;
+	 
+	// ADD EVENT LISTENERS
+	tab1.addEventListener('click',function() {
+		if (currTab != this) {
+		    currTab.backgroundColor = '#000';
+		    currTab.children[0].color = '#777';
+		    this.backgroundColor = '#333';
+		    this.children[0].color = '#FFF';
+		    currTab = this;
+		    toggleView();
+	    }
+	});
+	tab2.addEventListener('click',function() {
+		if (currTab != this) {
+		    currTab.backgroundColor = '#000';
+		    currTab.children[0].color = '#777';
+		    this.backgroundColor = '#333';
+		    this.children[0].color = '#FFF';
+		    currTab = this;
+		    toggleView();
+	    }
+	});
 }
 
 
 function toggleView() {
 	if ($.mapView.visible) {
-		$.completedFormsTableView.show();
-		$.mapView.hide();
+		$.completedFormsTableView.visible = true;
+		$.mapView.visible = false;
 	} else {
-		$.completedFormsTableView.hide();
-		$.mapView.show();
+		$.completedFormsTableView.visible = false;
+		$.mapView.visible = true;
 	}
 }
 
 
 // Creates an editForm window when a form is clicked
 $.completedFormsTableView.addEventListener('click', function(event) {
-	Ti.API.info("Parameter " + event.rowData.label.text);
 	var controller = Alloy.createController('editForm', { formID: event.rowData.label.text }).getView();
 	$.dataTab.open(controller);
 });
 
 
-//Ti.App.addEventListener('loadFormsIntoList', function() {
 function loadFormsIntoList() {
 	Ti.API.info("INNNNNN");
 	var completedForms = Ti.App.Properties.getList("completedForms");
+	Ti.API.info(completedForms);
 	var formsToDisplay = []
 	
 	for (var i = 0; i < completedForms.length; ++i) {
@@ -62,7 +132,8 @@ function loadFormsIntoList() {
 			height: '40dp',
 			backgroundColor: 'white',
 			hasDetail: true,
-			backgroundSelectedColor: 'gray'
+			backgroundSelectedColor: 'gray',
+			className: "someTableViewRow"
 		});
 		
 		if (OS_ANDROID) {
@@ -79,14 +150,12 @@ function loadFormsIntoList() {
 	$.completedFormsTableView.editable = true;
 	$.completedFormsTableView.moveable = true;
 }
-//});
 
 
 // IOS event listener for delete button on iOS when deleting forms
 $.completedFormsTableView.addEventListener('delete', function(event) {
 	deleteForm(event);
 	loadFormsIntoList();
-	//Ti.App.fireEvent('loadFormsIntoList');
 });
 
 
@@ -101,7 +170,6 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 				if (e.index == 0) { // Delete
 					deleteForm(event);
 					loadFormsIntoList();
-					//Ti.App.fireEvent('loadFormsIntoList');
 				} else {
 					// Do nothing
 				}	

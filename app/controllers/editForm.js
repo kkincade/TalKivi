@@ -33,7 +33,9 @@ function saveForm() {
 	
 	form.fields = tempFields;
 	Ti.App.Properties.setObject(form.TDP_id, form);
-	completedForms.push(form.TDP_id);
+	if (completedForms.indexOf(formID) == -1) {
+		completedForms.push(form.TDP_id);
+	}
 	Ti.App.Properties.setList("completedForms", completedForms);
 }
 
@@ -44,11 +46,9 @@ function loadTemplate() {
 	var form = Ti.App.Properties.getObject(formID);
 	var template = Ti.App.Properties.getObject(form.formName);
 	formHandler.generateTemplate(template, $.tableView);
-	Ti.API.info($.tableView.data[0].rows.length);
+
 	// Set the values to display
 	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
-		Ti.API.info("Value: " + value);
-		Ti.API.info("Row: " + $.tableView.data[0].rows[i]);
 		var value = form.fields[i];
 		setFieldValue($.tableView.data[0].rows[i], value);
 	}

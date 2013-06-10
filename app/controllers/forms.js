@@ -1,22 +1,3 @@
-// if (OS_ANDROID) {
-// 	
-	// var activity = $.navGroupWindow.activity;
-// 
-	// activity.onPrepareOptionsMenu = function(e) {
-	  // Ti.API.info("FORMS");
-	  // var menu = e.menu;
-	  // menu.clear();
-	  // var menuItem = menu.add({ 
-	    // title: "ONE", 
-	    // icon:  "item1.png",
-	    // showAsAction: Ti.Android.SHOW_AS_ACTION_IF_ROOM
-	  // });
-	  // menuItem.addEventListener("click", function(e) {
-	    // Ti.API.debug("I was clicked");
-	  // });
-	// };
-// }
-
 
 Ti.App.addEventListener('populateTemplates', function() {
 	var activeTemplates = Ti.App.Properties.getList("activeTemplates");

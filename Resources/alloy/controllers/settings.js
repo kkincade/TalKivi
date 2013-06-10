@@ -8,11 +8,11 @@ function Controller() {
         id: "settingsWindow",
         title: "Settings"
     });
-    $.__views.__alloyId23 = Ti.UI.createLabel({
+    $.__views.__alloyId19 = Ti.UI.createLabel({
         text: "Settings",
-        id: "__alloyId23"
+        id: "__alloyId19"
     });
-    $.__views.settingsWindow.add($.__views.__alloyId23);
+    $.__views.settingsWindow.add($.__views.__alloyId19);
     $.__views.settingsTab = Ti.UI.createTab({
         window: $.__views.settingsWindow,
         id: "settingsTab",

@@ -5,21 +5,25 @@ $.newFormWindow.title = formName; // Set title of window
 loadTemplate();
 
 function submitButtonClicked() {
+	Ti.API.info("Submit Button Clicked");
 	var messageString = validateForm();
-	
+	//var messageString = "";
 	if (messageString == "") {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
-		alertDialog.show();
-		submitForm();
+		//var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
+		//alertDialog.show();
+		//submitForm();
+		Ti.API.info("Form Submitted Successfully");
 		$.newFormWindow.close();
 	} else {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
-		alertDialog.show();
+		Ti.API.info("Form incorrect");
+		//var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
+		//alertDialog.show();
 	}
 }
 
 
 function submitForm() {
+	Ti.API.info("Submitting Form");
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
 	
@@ -79,20 +83,23 @@ $.tableView.addEventListener('androidback', function(event) {
 
 // Loop over every row in table view and validate the contents
 function validateForm() {
+	Ti.API.info("Validating Form");
 	
 	var messageString = ""; // Start with blank error message
+	var fieldObject = $.tableView.data[0].rows[0].fieldObject;
+	var value = getFieldValue($.tableView.data[0].rows[0]);
 	
 	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
-		
-		var fieldObject = $.tableView.data[0].rows[i].fieldObject;
-		var value = getFieldValue($.tableView.data[0].rows[i]);
+		Ti.API.info(i);
+		//fieldObject = $.tableView.data[0].rows[i].fieldObject;
+		// value = getFieldValue($.tableView.data[0].rows[i]);
 		
 		// Checks if the field is blank and/or required
 		if (value == "" || value == null) {
 			if (fieldObject.required == "No") {
 				continue;
 			} else {
-				messageString += fieldObject.prompt + " is a required field.\n";
+				//messageString += fieldObject.prompt + " is a required field.\n";
 				continue;
 			}
 		}

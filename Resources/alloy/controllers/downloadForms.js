@@ -23,6 +23,10 @@ function Controller() {
                     backgroundSelectedColor: "gray",
                     rowID: templatesFromJSON[i].rowid
                 });
+                $.downloadTemplatesWindow.backgroundColor = "black";
+                singleTemplate.label.color = "white";
+                singleTemplate.backgroundColor = "black";
+                singleTemplate.rightImage = path + "plus_icon_android.png";
                 if (-1 != Ti.App.Properties.getList("activeTemplates").indexOf(templatesFromJSON[i].name)) {
                     label.color = "gray";
                     singleTemplate.selectedColor = "white";
@@ -54,7 +58,6 @@ function Controller() {
             var tempTemplates = Ti.App.Properties.getList("activeTemplates");
             tempTemplates.push(templateFromJSON.name);
             Ti.App.Properties.setList("activeTemplates", tempTemplates);
-            Ti.API.info(Ti.App.Properties.getList("activeTemplates"));
         };
         var templateAPI = "http://www.talkivi.org/talkivi-server/ws/form?rowid=" + event.rowData.rowID + "&format=JSON";
         HTTP_CLIENT.open("POST", templateAPI);
@@ -86,9 +89,7 @@ function Controller() {
     _.extend($, $.__views);
     $.downloadTemplatesWindow.modal = true;
     $.downloadTemplatesWindow.open();
-    {
-        Titanium.Filesystem.resourcesDirectory;
-    }
+    var path = Titanium.Filesystem.resourcesDirectory;
     loadTemplates();
     $.downloadTemplatesWindow.addEventListener("androidback", function() {
         $.downloadTemplatesWindow.close();
