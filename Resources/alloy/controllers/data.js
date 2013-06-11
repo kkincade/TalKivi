@@ -79,7 +79,9 @@ function Controller() {
     $.__views.dataTab && $.addTopLevelView($.__views.dataTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    loadFormsIntoList();
+    $.dataTab.addEventListener("focus", function() {
+        loadFormsIntoList();
+    });
     $.mapView.visible = false;
     var spacer = Math.round(.5 * Ti.Platform.displayCaps.platformWidth);
     var width = spacer - 4;
@@ -162,7 +164,7 @@ function Controller() {
             dialog.addEventListener("click", function(e) {
                 if (0 == e.index) {
                     deleteForm(event);
-                    loadFormsIntoList();
+                    Ti.App.fireEvent("loadFormsIntoList");
                 }
             });
             dialog.show();

@@ -265,12 +265,19 @@ function DateField(fieldObject) {
         value: fieldObject.default_value,
         clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
         hintText: fieldObject.description,
+        editable: false,
         width: Ti.UI.FILL,
         height: Ti.UI.SIZE,
         top: "10dp",
         left: "150dp",
         right: "10dp",
         bottom: "10dp"
+    });
+    textField.addEventListener("click", function(event) {
+        Ti.API.info("Event: " + event);
+        Ti.App.fireEvent("createDatePicker");
+        textField.blur();
+        Ti.API.info("now!");
     });
     var self = Ti.UI.createTableViewRow({
         fieldObject: fieldObject,
@@ -443,10 +450,20 @@ function Message(fieldObject) {
 }
 
 function LocationField(fieldObject) {
+    var longitude, latitude;
+    Ti.Geolocation.purpose = "TalKivi";
+    Ti.Geolocation.getCurrentPosition(function(e) {
+        if (!e.success) {
+            alert("Could not retrieve location!");
+            return;
+        }
+        longitude = e.coords.longitude;
+        latitude = e.coords.latitude;
+    });
     var textField = Ti.UI.createTextField({
         borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-        value: fieldObject.default_value,
+        value: latitude + ", " + longitude,
         clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
         hintText: fieldObject.description,
         width: Ti.UI.FILL,

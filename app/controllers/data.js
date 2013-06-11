@@ -1,4 +1,7 @@
-loadFormsIntoList();
+$.dataTab.addEventListener('focus', function(event) {
+	loadFormsIntoList();
+});
+
 $.mapView.visible = false;
 
 // iOS
@@ -111,11 +114,12 @@ $.completedFormsTableView.addEventListener('click', function(event) {
 });
 
 
+//Ti.App.addEventListener('loadFormsIntoList', function() {
 function loadFormsIntoList() {
 	Ti.API.info("INNNNNN");
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	Ti.API.info(completedForms);
-	var formsToDisplay = []
+	var formsToDisplay = [];
 	
 	for (var i = 0; i < completedForms.length; ++i) {
 		// Create Label
@@ -150,11 +154,13 @@ function loadFormsIntoList() {
 	$.completedFormsTableView.editable = true;
 	$.completedFormsTableView.moveable = true;
 }
+//});
 
 
 // IOS event listener for delete button on iOS when deleting forms
 $.completedFormsTableView.addEventListener('delete', function(event) {
 	deleteForm(event);
+	//Ti.App.fireEvent('loadFormsIntoList');
 	loadFormsIntoList();
 });
 
@@ -169,7 +175,8 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 			dialog.addEventListener('click', function(e) {
 				if (e.index == 0) { // Delete
 					deleteForm(event);
-					loadFormsIntoList();
+					Ti.App.fireEvent('loadFormsIntoList');
+					// loadFormsIntoList();
 				} else {
 					// Do nothing
 				}	

@@ -23,11 +23,12 @@ function saveButtonClicked() {
 function saveForm() {
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var form = Ti.App.Properties.getObject(formID);
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
 	
 	tempFields = [];
 	// Construct the form object we are going to save
-	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
-		var value = getFieldValue($.tableView.data[0].rows[i]);
+	for (var i = 0; i < tableViewRows.length; ++i) {
+		var value = getFieldValue(tableViewRows[i]);
 		tempFields.push(value);
 	}
 	
@@ -41,16 +42,16 @@ function saveForm() {
 
 // When a template is selected,
 function loadTemplate() {
-	
 	// Load in template to use and the form to get the values to display in the form
 	var form = Ti.App.Properties.getObject(formID);
 	var template = Ti.App.Properties.getObject(form.formName);
 	formHandler.generateTemplate(template, $.tableView);
-
+	var tableViewRows = $.tableView.data[0].rows;
+	
 	// Set the values to display
-	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
+	for (var i = 0; i < tableViewRows.length; ++i) {
 		var value = form.fields[i];
-		setFieldValue($.tableView.data[0].rows[i], value);
+		setFieldValue(tableViewRows[i], value);
 	}
 }
 
@@ -84,11 +85,12 @@ $.tableView.addEventListener('androidback', function(event) {
 function validateForm() {
 	
 	var messageString = ""; // Start with blank error message
+	var tableViewRows = $.tableView.data[0].rows;
 	
-	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
+	for (var i = 0; i < tableViewRows.length; ++i) {
 		
-		var fieldObject = $.tableView.data[0].rows[i].fieldObject;
-		var value = getFieldValue($.tableView.data[0].rows[i]);
+		var fieldObject = tableViewRows[i].fieldObject;
+		var value = getFieldValue(tableViewRows[i]);
 		
 		if (fieldObject.field_type == 'Checkbox') {
 			continue;

@@ -20,9 +20,10 @@ function Controller() {
     function saveForm() {
         var completedForms = Ti.App.Properties.getList("completedForms");
         var form = Ti.App.Properties.getObject(formID);
+        var tableViewRows = $.tableView.data[0].rows;
         tempFields = [];
-        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
-            var value = getFieldValue($.tableView.data[0].rows[i]);
+        for (var i = 0; tableViewRows.length > i; ++i) {
+            var value = getFieldValue(tableViewRows[i]);
             tempFields.push(value);
         }
         form.fields = tempFields;
@@ -34,16 +35,18 @@ function Controller() {
         var form = Ti.App.Properties.getObject(formID);
         var template = Ti.App.Properties.getObject(form.formName);
         formHandler.generateTemplate(template, $.tableView);
-        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
+        var tableViewRows = $.tableView.data[0].rows;
+        for (var i = 0; tableViewRows.length > i; ++i) {
             var value = form.fields[i];
-            setFieldValue($.tableView.data[0].rows[i], value);
+            setFieldValue(tableViewRows[i], value);
         }
     }
     function validateForm() {
         var messageString = "";
-        for (var i = 0; $.tableView.data[0].rows.length > i; ++i) {
-            var fieldObject = $.tableView.data[0].rows[i].fieldObject;
-            var value = getFieldValue($.tableView.data[0].rows[i]);
+        var tableViewRows = $.tableView.data[0].rows;
+        for (var i = 0; tableViewRows.length > i; ++i) {
+            var fieldObject = tableViewRows[i].fieldObject;
+            var value = getFieldValue(tableViewRows[i]);
             if ("Checkbox" == fieldObject.field_type) continue;
             if ("" == value || null == value) {
                 if ("No" == fieldObject.required) continue;

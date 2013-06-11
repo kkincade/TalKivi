@@ -5,25 +5,21 @@ $.newFormWindow.title = formName; // Set title of window
 loadTemplate();
 
 function submitButtonClicked() {
-	Ti.API.info("Submit Button Clicked");
 	var messageString = validateForm();
-	//var messageString = "";
+
 	if (messageString == "") {
-		//var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
-		//alertDialog.show();
-		//submitForm();
-		Ti.API.info("Form Submitted Successfully");
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
+		alertDialog.show();
+		submitForm();
 		$.newFormWindow.close();
 	} else {
-		Ti.API.info("Form incorrect");
-		//var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
-		//alertDialog.show();
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
+		alertDialog.show();
 	}
 }
 
 
 function submitForm() {
-	Ti.API.info("Submitting Form");
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
 	
@@ -35,11 +31,12 @@ function submitForm() {
 	
 	++TDP_id;
 	Ti.App.Properties.setInt("TDP_INCREMENT", TDP_id);
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
 	
 	tempFields = [];
 	// Construct the form object we are going to save
-	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
-		var value = getFieldValue($.tableView.data[0].rows[i]);
+	for (var i = 0; i < tableViewRows.length; ++i) {
+		var value = getFieldValue(tableViewRows[i]);
 		tempFields.push(value);
 	}
 	
@@ -80,26 +77,97 @@ $.tableView.addEventListener('androidback', function(event) {
 	Ti.App.fireEvent('populateTemplates');
 });
 
+Ti.App.addEventListener('createDatePicker', function(event) {
+	var view = Ti.UI.createView({
+		height: 260, 
+		bottom: -260
+	});
+	
+	var minDate = new Date();
+	var dateValue = new Date();
+	minDate.setFullYear(1900); minDate.setMonth(0); minDate.setDate(1);
+	var maxDate = dateValue;
+	
+	var picker = Ti.UI.createPicker({
+		type: Ti.UI.PICKER_TYPE_DATE,
+		minDate: minDate,
+		maxDate: maxDate, 
+		value: dateValue, 
+		selectionIndicator: true,
+		bottom: 0
+	});
+	
+	view.add(picker);
+	
+	if (OS_IOS) {
+		var cancelButton =  Titanium.UI.createButton({
+			title:'Cancel',
+			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+		});
+		 
+		var doneButton =  Titanium.UI.createButton({
+			title:'Done',
+			style:Titanium.UI.iPhone.SystemButtonStyle.DONE
+		});
+		 
+		var spacer =  Titanium.UI.createButton({
+			systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+		});
+		 
+		var toolbar = Titanium.UI.iOS.createToolbar({
+			top: 0,
+			items:[cancelButton, spacer, doneButton]
+		});
+		
+		doneButton.addEventListener('click', function(e) {
+			var date = picker.getValue();
+			view.animate({ bottom: -260, duration: 500 });
+			return date.toUTCString();
+		});
+		
+		cancelButton.addEventListener('click', function(e) {
+			view.animate({ bottom: -260, duration: 500 });
+		});
+		
+		view.add(toolbar);
+		
+	} else if (OS_ANDROID) {
+		Ti.API.info("Create Alert Dialog");
+		var dialog = Ti.UI.createAlertDialog({ androidView: view,  buttonNames: ['Cancel', 'Set'] });
+			
+		dialog.addEventListener('click', function(e) {
+			if (e.index == 0) { // Cancel
+				Ti.API.info("Cancel");
+			} else {
+				Ti.API.info("Set");
+				// Do nothing
+			}	
+		});
+		dialog.show();
+	}
+		
+	if (OS_IOS) {
+		$.newFormWindow.add(view);
+		view.animate({ bottom: 0, duration: 500 });
+	}
+	
+});
 
 // Loop over every row in table view and validate the contents
 function validateForm() {
-	Ti.API.info("Validating Form");
-	
 	var messageString = ""; // Start with blank error message
-	var fieldObject = $.tableView.data[0].rows[0].fieldObject;
-	var value = getFieldValue($.tableView.data[0].rows[0]);
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
 	
-	for (var i = 0; i < $.tableView.data[0].rows.length; ++i) {
-		Ti.API.info(i);
-		//fieldObject = $.tableView.data[0].rows[i].fieldObject;
-		// value = getFieldValue($.tableView.data[0].rows[i]);
+	for (var i = 0; i < tableViewRows.length; i++) {
+		fieldObject = tableViewRows[i].fieldObject;
+		value = getFieldValue(tableViewRows[i]);
 		
 		// Checks if the field is blank and/or required
 		if (value == "" || value == null) {
 			if (fieldObject.required == "No") {
 				continue;
 			} else {
-				//messageString += fieldObject.prompt + " is a required field.\n";
+				messageString += fieldObject.prompt + " is a required field.\n";
 				continue;
 			}
 		}

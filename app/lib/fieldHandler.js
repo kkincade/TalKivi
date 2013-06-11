@@ -22,7 +22,6 @@ function generateFieldView(fieldObject) {
 	else { return unknownField(fieldObject); }
 }
 
-
 function TextField(fieldObject) {
 	
 	var textField = Ti.UI.createTextField({
@@ -87,7 +86,6 @@ function TextField(fieldObject) {
 	return self;	
 }
 
-
 function CheckboxField(fieldObject) {
 	
 
@@ -130,7 +128,6 @@ function CheckboxField(fieldObject) {
 
 	return self;	
 }
-
 
 function Integer(fieldObject) {
 	
@@ -195,7 +192,6 @@ function Integer(fieldObject) {
 	return self;	
 }
 
-
 function Decimal(fieldObject) {
 	
 	var textField = Ti.UI.createTextField({
@@ -257,7 +253,6 @@ function Decimal(fieldObject) {
 	
 	return self;	
 }
-
 
 function Calculated(fieldObject) {
 	
@@ -321,7 +316,6 @@ function Calculated(fieldObject) {
 	return self;	
 }
 
-
 function Incremental_Text(fieldObject) {
 	
 	var textField = Ti.UI.createTextField({
@@ -384,7 +378,6 @@ function Incremental_Text(fieldObject) {
 	return self;	
 }
 
-
 function DateField(fieldObject) {
 	
 	var textField = Ti.UI.createTextField({
@@ -393,6 +386,7 @@ function DateField(fieldObject) {
 		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		editable: false,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -401,6 +395,13 @@ function DateField(fieldObject) {
 		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
+	});
+
+	textField.addEventListener('click', function(event) {
+		Ti.API.info("Event: " + event);
+		Ti.App.fireEvent('createDatePicker');
+		textField.blur();
+		Ti.API.info('now!');
 	});
 	
 	var self = Ti.UI.createTableViewRow({
@@ -412,6 +413,7 @@ function DateField(fieldObject) {
 			fontWeight: 'bold'
 		}
 	});
+	
 	
 	// Create view if we are running Android
 	if (OS_ANDROID) {
@@ -446,7 +448,6 @@ function DateField(fieldObject) {
 	
 	return self;		
 }
-
 
 function Time(fieldObject) {
 	var textField = Ti.UI.createTextField({
@@ -508,7 +509,6 @@ function Time(fieldObject) {
 	
 	return self;		
 }
-
 
 function Date_Time(fieldObject) {
 	var textField = Ti.UI.createTextField({
@@ -572,7 +572,6 @@ function Date_Time(fieldObject) {
 	return self;		
 }
 
-
 function Message(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
@@ -635,12 +634,23 @@ function Message(fieldObject) {
 	return self;		
 }
 
-
 function LocationField(fieldObject) {
+	var longitude, latitude;
+	Ti.Geolocation.purpose = "TalKivi";
+	Ti.Geolocation.getCurrentPosition( function(e) {
+		if (!e.success) {
+			//alert("Could not retrieve location!");
+			return;
+		}
+		longitude = e.coords.longitude;
+		latitude = e.coords.latitude;
+	});
+	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: latitude + ", " + longitude,
+		//value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -696,7 +706,6 @@ function LocationField(fieldObject) {
 	
 	return self;		
 }
-
 
 function Photo(fieldObject) {
 	var textField = Ti.UI.createTextField({
@@ -758,7 +767,6 @@ function Photo(fieldObject) {
 	
 	return self;		
 }
-
 
 function Recording(fieldObject) {
 	var textField = Ti.UI.createTextField({
@@ -822,7 +830,6 @@ function Recording(fieldObject) {
 	return self;		
 }
 
-
 function Selection(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
@@ -885,7 +892,6 @@ function Selection(fieldObject) {
 	return self;		
 }
 
-
 function Button_Selection(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
@@ -946,7 +952,6 @@ function Button_Selection(fieldObject) {
 	
 	return self;		
 }
-
 
 function Structural_Attitude(fieldObject) {
 	var textField = Ti.UI.createTextField({
@@ -1071,7 +1076,6 @@ function unknownField(fieldObject) {
 	
 	return self;		
 }
-
 
 function checkLabelLength(tableViewRow) {
 	var length = tableViewRow.title.length;
