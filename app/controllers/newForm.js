@@ -121,8 +121,13 @@ Ti.App.addEventListener('createDatePicker', function(event) {
 		
 		doneButton.addEventListener('click', function(e) {
 			var date = picker.getValue();
+			var day = date.getDate();
+			var month = date.getMonth() + 1;
+			var year = date.getFullYear();
+			
+			// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+			Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
 			view.animate({ bottom: -260, duration: 500 });
-			return date.toUTCString();
 		});
 		
 		cancelButton.addEventListener('click', function(e) {
@@ -139,11 +144,211 @@ Ti.App.addEventListener('createDatePicker', function(event) {
 			if (e.index == 0) { // Cancel
 				Ti.API.info("Cancel");
 			} else {
-				Ti.API.info("Set");
-				// Do nothing
+				var date = picker.getValue();
+				var day = date.getDate();
+				var month = date.getMonth() + 1;
+				var year = date.getFullYear();
+					
+				// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+				Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
 			}	
 		});
 		dialog.show();
+	}
+		
+	if (OS_IOS) {
+		$.newFormWindow.add(view);
+		view.animate({ bottom: 0, duration: 500 });
+	}
+	
+});
+
+Ti.App.addEventListener('createTimePicker', function(event) {
+	var view = Ti.UI.createView({
+		height: 260, 
+		bottom: -260
+	});
+	
+	var date = new Date();
+	
+	var picker = Ti.UI.createPicker({
+		type: Ti.UI.PICKER_TYPE_TIME,
+		value: date,
+		selectionIndicator: true,
+		bottom: 0
+	});
+	
+	view.add(picker);
+	
+	if (OS_IOS) {
+		var cancelButton =  Titanium.UI.createButton({
+			title:'Cancel',
+			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+		});
+		 
+		var doneButton =  Titanium.UI.createButton({
+			title:'Done',
+			style:Titanium.UI.iPhone.SystemButtonStyle.DONE
+		});
+		 
+		var spacer =  Titanium.UI.createButton({
+			systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+		});
+		 
+		var toolbar = Titanium.UI.iOS.createToolbar({
+			top: 0,
+			items:[cancelButton, spacer, doneButton]
+		});
+		
+		doneButton.addEventListener('click', function(e) {
+			var date = picker.getValue();
+			var hours = date.getHours();
+			var minutes = date.getMinutes();
+			// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+			Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
+			view.animate({ bottom: -260, duration: 500 });
+		});
+		
+		cancelButton.addEventListener('click', function(e) {
+			view.animate({ bottom: -260, duration: 500 });
+		});
+		
+		view.add(toolbar);
+		
+	} else if (OS_ANDROID) {
+		var dialog = Ti.UI.createAlertDialog({ androidView: view,  buttonNames: ['Cancel', 'Set'] });
+			
+		dialog.addEventListener('click', function(e) {
+			if (e.index == 0) { // Cancel
+				Ti.API.info("Cancel");
+			} else {
+				var date = picker.getValue();
+				var hours = date.getHours();
+				var minutes = date.getMinutes();
+				// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+				Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
+			}	
+		});
+		dialog.show();
+	}
+		
+	if (OS_IOS) {
+		$.newFormWindow.add(view);
+		view.animate({ bottom: 0, duration: 500 });
+	}
+	
+});
+
+Ti.App.addEventListener('createDateTimePicker', function(event) {
+	var view = Ti.UI.createView({
+		height: 260, 
+		bottom: -260
+	});
+	
+	var date = new Date();
+	
+	if (OS_IOS) {
+		var picker = Ti.UI.createPicker({
+			type: Ti.UI.PICKER_TYPE_DATE_AND_TIME,
+			value: date,
+			selectionIndicator: true,
+			bottom: 0
+		});
+		view.add(picker);
+	// ANDROID
+	} else if (OS_ANDROID) {
+		var timeView = Ti.UI.createView({
+			height: 260,
+			bottom: -260
+		});
+		
+		var datePicker = Ti.UI.createPicker({
+			type: Ti.UI.PICKER_TYPE_DATE,
+			value: date,
+			selectionIndicator: true,
+			bottom: 0
+		});
+		view.add(datePicker);
+		
+		var timePicker = Ti.UI.createPicker({
+			type: Ti.UI.PICKER_TYPE_TIME,
+			value: date,
+			selectionIndicator: true,
+			bottom: 0
+		});
+		
+		timeView.add(timePicker);
+	}
+	
+	if (OS_IOS) {
+		var cancelButton =  Titanium.UI.createButton({
+			title:'Cancel',
+			style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+		});
+		 
+		var doneButton =  Titanium.UI.createButton({
+			title:'Done',
+			style:Titanium.UI.iPhone.SystemButtonStyle.DONE
+		});
+		 
+		var spacer =  Titanium.UI.createButton({
+			systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+		});
+		 
+		var toolbar = Titanium.UI.iOS.createToolbar({
+			top: 0,
+			items:[cancelButton, spacer, doneButton]
+		});
+		
+		doneButton.addEventListener('click', function(e) {
+			var date = picker.getValue();
+			var day = date.getDate();
+			var month = date.getMonth() + 1;
+			var year = date.getFullYear();
+			var hours = date.getHours();
+			var minutes = date.getMinutes();
+			
+			// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+			Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
+			view.animate({ bottom: -260, duration: 500 });
+		});
+		
+		cancelButton.addEventListener('click', function(e) {
+			view.animate({ bottom: -260, duration: 500 });
+		});
+		
+		view.add(toolbar);
+		
+	} else if (OS_ANDROID) {
+		var dateDialog = Ti.UI.createAlertDialog({ androidView: view,  buttonNames: ['Cancel', 'Set'] });
+		var timeDialog = Ti.UI.createAlertDialog({ androidView: timeView, buttonNames: ['Cancel', 'Set'] });	
+		var day, month, year, hours, minutes;
+		
+		timeDialog.addEventListener('click', function(e) {
+			if (e.index == 0) { // Cancel
+				Ti.API.info("Cancel");
+			} else {
+				var date = timePicker.getValue();
+				hours = date.getHours();
+				minutes = date.getMinutes();
+				// Temporary property in order to fill out form with date from picker (instantiated in fieldHandler.js)
+				Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
+			}	
+		});
+		
+		dateDialog.addEventListener('click', function(e) {
+			if (e.index == 0) { // Cancel
+				Ti.API.info("Cancel");
+			} else {
+				var date = datePicker.getValue();
+				day = date.getDate();
+				month = date.getMonth();
+				year = date.getFullYear();
+				timeDialog.show();
+			}	
+		});
+	
+		dateDialog.show();
 	}
 		
 	if (OS_IOS) {

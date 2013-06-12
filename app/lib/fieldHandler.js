@@ -379,11 +379,15 @@ function Incremental_Text(fieldObject) {
 }
 
 function DateField(fieldObject) {
+	var date = new Date();
+	var day = date.getDate();
+	var month = date.getMonth() + 1;
+	var year = date.getFullYear();
 	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: month + "-" + day + "-" + year,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		editable: false,
@@ -400,6 +404,7 @@ function DateField(fieldObject) {
 	textField.addEventListener('click', function(event) {
 		Ti.API.info("Event: " + event);
 		Ti.App.fireEvent('createDatePicker');
+		Ti.App.dateTextFieldParameter = textField;
 		textField.blur();
 		Ti.API.info('now!');
 	});
@@ -450,12 +455,17 @@ function DateField(fieldObject) {
 }
 
 function Time(fieldObject) {
+	var date = new Date();
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: hours + ":" + minutes + ":00",
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		editable: false,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -464,6 +474,12 @@ function Time(fieldObject) {
 		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
+	});
+
+	textField.addEventListener('click', function(event) {
+		Ti.App.fireEvent('createTimePicker');
+		Ti.App.timeTextFieldParameter = textField;
+		textField.blur();
 	});
 	
 	var self = Ti.UI.createTableViewRow({
@@ -475,6 +491,7 @@ function Time(fieldObject) {
 			fontWeight: 'bold'
 		}
 	});
+	
 	
 	// Create view if we are running Android
 	if (OS_ANDROID) {
@@ -511,12 +528,20 @@ function Time(fieldObject) {
 }
 
 function Date_Time(fieldObject) {
+	var date = new Date();
+	var day = date.getDate();
+	var month = date.getMonth() + 1;
+	var year = date.getFullYear();
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00",
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		editable: false,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -525,6 +550,14 @@ function Date_Time(fieldObject) {
 		left: '150dp',
 		right: '10dp',
 		bottom: '10dp'
+	});
+
+	textField.addEventListener('click', function(event) {
+		Ti.API.info("Event: " + event);
+		Ti.App.fireEvent('createDateTimePicker');
+		Ti.App.dateTimeTextFieldParameter = textField;
+		textField.blur();
+		Ti.API.info('now!');
 	});
 	
 	var self = Ti.UI.createTableViewRow({
@@ -536,6 +569,7 @@ function Date_Time(fieldObject) {
 			fontWeight: 'bold'
 		}
 	});
+	
 	
 	// Create view if we are running Android
 	if (OS_ANDROID) {
@@ -562,7 +596,6 @@ function Date_Time(fieldObject) {
 		view.add(label);
 		view.add(textField);
 		self.add(view);
-		
 	// iOS side
 	} else {
 		self.add(textField);

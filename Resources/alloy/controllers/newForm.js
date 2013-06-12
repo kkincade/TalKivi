@@ -127,9 +127,94 @@ function Controller() {
             buttonNames: [ "Cancel", "Set" ]
         });
         dialog.addEventListener("click", function(e) {
-            0 == e.index ? Ti.API.info("Cancel") : Ti.API.info("Set");
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = picker.getValue();
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
+            }
         });
         dialog.show();
+    });
+    Ti.App.addEventListener("createTimePicker", function() {
+        var view = Ti.UI.createView({
+            height: 260,
+            bottom: -260
+        });
+        var date = new Date();
+        var picker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_TIME,
+            value: date,
+            selectionIndicator: true,
+            bottom: 0
+        });
+        view.add(picker);
+        var dialog = Ti.UI.createAlertDialog({
+            androidView: view,
+            buttonNames: [ "Cancel", "Set" ]
+        });
+        dialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = picker.getValue();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
+            }
+        });
+        dialog.show();
+    });
+    Ti.App.addEventListener("createDateTimePicker", function() {
+        var view = Ti.UI.createView({
+            height: 260,
+            bottom: -260
+        });
+        var date = new Date();
+        var timeView = Ti.UI.createView({
+            height: 260,
+            bottom: -260
+        });
+        var datePicker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_DATE,
+            value: date,
+            selectionIndicator: true,
+            bottom: 0
+        });
+        view.add(datePicker);
+        var timePicker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_TIME,
+            value: date,
+            selectionIndicator: true,
+            bottom: 0
+        });
+        timeView.add(timePicker);
+        var dateDialog = Ti.UI.createAlertDialog({
+            androidView: view,
+            buttonNames: [ "Cancel", "Set" ]
+        });
+        var timeDialog = Ti.UI.createAlertDialog({
+            androidView: timeView,
+            buttonNames: [ "Cancel", "Set" ]
+        });
+        var day, month, year, hours, minutes;
+        timeDialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = timePicker.getValue();
+                hours = date.getHours();
+                minutes = date.getMinutes();
+                Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
+            }
+        });
+        dateDialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = datePicker.getValue();
+                day = date.getDate();
+                month = date.getMonth();
+                year = date.getFullYear();
+                timeDialog.show();
+            }
+        });
+        dateDialog.show();
     });
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
