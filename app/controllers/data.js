@@ -25,29 +25,25 @@ if (OS_IOS) {
 } else {
 	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth*0.5);
 	var width = spacer-4;
-	var height = 36;
-	 
-	var win = Ti.UI.createWindow({
-	    backgroundColor:'#FFF'
-	});
+	var height = '36dp';
  
 	// TAB BAR
 	var tabBar = Ti.UI.createView({
-	    width:Ti.Platform.displayCaps.platformWidth,
-	    height:40,
-	    left:0,
-	    bottom:0,
-	    backgroundColor:'transparent'
+	    width: Ti.Platform.displayCaps.platformWidth,
+	    height: '40dp',
+	    left: '0dp',
+	    bottom: '0dp',
+	    backgroundColor: 'transparent'
 	});
 	$.dataWindow.add(tabBar);
 	// TAB 1
 	var tab1 = Ti.UI.createView({
-	    width:width,
-	    height:height,
-	    left:2,
-	    bottom:2,
+	    width: width,
+	    height: height,
+	    left: '2dp',
+	    bottom: '2dp',
 	    backgroundColor:'#333',
-	    borderRadius:2
+	    borderRadius: '2dp'
 	});
 	var tab1Label = Ti.UI.createLabel({
 	    text:'List View',
@@ -60,7 +56,7 @@ if (OS_IOS) {
 	    width:width,
 	    height:height,
 	    left:spacer,
-	    bottom:2,
+	    bottom: '2dp',
 	    backgroundColor:'#000'
 	});
 	var tab2Label = Ti.UI.createLabel({

@@ -672,9 +672,10 @@ function LocationField(fieldObject) {
 	Ti.Geolocation.purpose = "TalKivi";
 	Ti.Geolocation.getCurrentPosition( function(e) {
 		if (!e.success) {
-			//alert("Could not retrieve location!");
+			alert("Could not retrieve location!");
 			return;
 		}
+		Ti.API.info("Setting location");
 		longitude = e.coords.longitude;
 		latitude = e.coords.latitude;
 	});

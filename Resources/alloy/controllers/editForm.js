@@ -74,19 +74,17 @@ function Controller() {
         id: "editFormWindow"
     });
     $.__views.editFormWindow && $.addTopLevelView($.__views.editFormWindow);
+    $.__views.saveButton = Ti.UI.createButton({
+        id: "saveButton",
+        title: "Save",
+        style: Ti.UI.iPhone.SystemButtonStyle.DONE
+    });
+    saveButtonClicked ? $.__views.saveButton.addEventListener("click", saveButtonClicked) : __defers["$.__views.saveButton!click!saveButtonClicked"] = true;
+    $.__views.editFormWindow.rightNavButton = $.__views.saveButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.editFormWindow.add($.__views.tableView);
-    $.__views.editFormWindow.activity.onCreateOptionsMenu = function(e) {
-        var __alloyId7 = {
-            title: "Save Form",
-            id: "__alloyId6"
-        };
-        $.__views.__alloyId6 = e.menu.add(_.pick(__alloyId7, Alloy.Android.menuItemCreateArgs));
-        $.__views.__alloyId6.applyProperties(_.omit(__alloyId7, Alloy.Android.menuItemCreateArgs));
-        submitFormButtonClicked ? $.__views.__alloyId6.addEventListener("click", submitFormButtonClicked) : __defers["$.__views.__alloyId6!click!submitFormButtonClicked"] = true;
-    };
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");

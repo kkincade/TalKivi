@@ -71,16 +71,17 @@ function Controller() {
         id: "newFormWindow"
     });
     $.__views.newFormWindow && $.addTopLevelView($.__views.newFormWindow);
+    $.__views.submitButton = Ti.UI.createButton({
+        id: "submitButton",
+        title: "Submit",
+        style: Ti.UI.iPhone.SystemButtonStyle.DONE
+    });
+    submitButtonClicked ? $.__views.submitButton.addEventListener("click", submitButtonClicked) : __defers["$.__views.submitButton!click!submitButtonClicked"] = true;
+    $.__views.newFormWindow.rightNavButton = $.__views.submitButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.newFormWindow.add($.__views.tableView);
-    $.__views.submitButton = Ti.UI.createButton({
-        id: "submitButton",
-        title: "Submit Form"
-    });
-    $.__views.newFormWindow.add($.__views.submitButton);
-    submitButtonClicked ? $.__views.submitButton.addEventListener("click", submitButtonClicked) : __defers["$.__views.submitButton!click!submitButtonClicked"] = true;
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");
@@ -121,21 +122,44 @@ function Controller() {
             bottom: 0
         });
         view.add(picker);
-        Ti.API.info("Create Alert Dialog");
-        var dialog = Ti.UI.createAlertDialog({
-            androidView: view,
-            buttonNames: [ "Cancel", "Set" ]
+        var cancelButton = Titanium.UI.createButton({
+            title: "Cancel",
+            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
         });
-        dialog.addEventListener("click", function(e) {
-            if (0 == e.index) Ti.API.info("Cancel"); else {
-                var date = picker.getValue();
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
-            }
+        var doneButton = Titanium.UI.createButton({
+            title: "Done",
+            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
         });
-        dialog.show();
+        var spacer = Titanium.UI.createButton({
+            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+        });
+        var toolbar = Titanium.UI.iOS.createToolbar({
+            top: 0,
+            items: [ cancelButton, spacer, doneButton ]
+        });
+        doneButton.addEventListener("click", function() {
+            var date = picker.getValue();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
+        });
+        cancelButton.addEventListener("click", function() {
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
+        });
+        view.add(toolbar);
+        $.newFormWindow.add(view);
+        view.animate({
+            bottom: 0,
+            duration: 500
+        });
     });
     Ti.App.addEventListener("createTimePicker", function() {
         var view = Ti.UI.createView({
@@ -150,19 +174,43 @@ function Controller() {
             bottom: 0
         });
         view.add(picker);
-        var dialog = Ti.UI.createAlertDialog({
-            androidView: view,
-            buttonNames: [ "Cancel", "Set" ]
+        var cancelButton = Titanium.UI.createButton({
+            title: "Cancel",
+            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
         });
-        dialog.addEventListener("click", function(e) {
-            if (0 == e.index) Ti.API.info("Cancel"); else {
-                var date = picker.getValue();
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
-            }
+        var doneButton = Titanium.UI.createButton({
+            title: "Done",
+            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
         });
-        dialog.show();
+        var spacer = Titanium.UI.createButton({
+            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+        });
+        var toolbar = Titanium.UI.iOS.createToolbar({
+            top: 0,
+            items: [ cancelButton, spacer, doneButton ]
+        });
+        doneButton.addEventListener("click", function() {
+            var date = picker.getValue();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
+        });
+        cancelButton.addEventListener("click", function() {
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
+        });
+        view.add(toolbar);
+        $.newFormWindow.add(view);
+        view.animate({
+            bottom: 0,
+            duration: 500
+        });
     });
     Ti.App.addEventListener("createDateTimePicker", function() {
         var view = Ti.UI.createView({
@@ -170,53 +218,54 @@ function Controller() {
             bottom: -260
         });
         var date = new Date();
-        var timeView = Ti.UI.createView({
-            height: 260,
-            bottom: -260
-        });
-        var datePicker = Ti.UI.createPicker({
-            type: Ti.UI.PICKER_TYPE_DATE,
+        var picker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_DATE_AND_TIME,
             value: date,
             selectionIndicator: true,
             bottom: 0
         });
-        view.add(datePicker);
-        var timePicker = Ti.UI.createPicker({
-            type: Ti.UI.PICKER_TYPE_TIME,
-            value: date,
-            selectionIndicator: true,
-            bottom: 0
+        view.add(picker);
+        var cancelButton = Titanium.UI.createButton({
+            title: "Cancel",
+            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
         });
-        timeView.add(timePicker);
-        var dateDialog = Ti.UI.createAlertDialog({
-            androidView: view,
-            buttonNames: [ "Cancel", "Set" ]
+        var doneButton = Titanium.UI.createButton({
+            title: "Done",
+            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
         });
-        var timeDialog = Ti.UI.createAlertDialog({
-            androidView: timeView,
-            buttonNames: [ "Cancel", "Set" ]
+        var spacer = Titanium.UI.createButton({
+            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
         });
-        var day, month, year, hours, minutes;
-        timeDialog.addEventListener("click", function(e) {
-            if (0 == e.index) Ti.API.info("Cancel"); else {
-                var date = timePicker.getValue();
-                hours = date.getHours();
-                minutes = date.getMinutes();
-                Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
-            }
+        var toolbar = Titanium.UI.iOS.createToolbar({
+            top: 0,
+            items: [ cancelButton, spacer, doneButton ]
         });
-        dateDialog.addEventListener("click", function(e) {
-            if (0 == e.index) Ti.API.info("Cancel"); else {
-                var date = datePicker.getValue();
-                day = date.getDate();
-                month = date.getMonth();
-                year = date.getFullYear();
-                timeDialog.show();
-            }
+        doneButton.addEventListener("click", function() {
+            var date = picker.getValue();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
         });
-        dateDialog.show();
+        cancelButton.addEventListener("click", function() {
+            view.animate({
+                bottom: -260,
+                duration: 500
+            });
+        });
+        view.add(toolbar);
+        $.newFormWindow.add(view);
+        view.animate({
+            bottom: 0,
+            duration: 500
+        });
     });
-    __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
     _.extend($, exports);
 }

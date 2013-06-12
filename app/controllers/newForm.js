@@ -4,6 +4,39 @@ $.newFormWindow.title = formName; // Set title of window
 
 loadTemplate();
 
+if (OS_ANDROID) {
+	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+	var width = spacer-4;
+	var height = '55dp';
+	
+	// Custom Button
+	var doneButtonView = Ti.UI.createView({
+	    width: width,
+	    height: height,
+	    left: '2dp',
+	    bottom: '2dp',
+	    backgroundColor: '#333',
+	    borderRadius: '2dp'
+	});
+	var doneButtonLabel = Ti.UI.createLabel({
+	    text:'Submit Form',
+	    font: {
+	    	fontSize: '14dp'
+	    },
+	    color:'#FFF'
+	});
+	doneButtonView.add(doneButtonLabel);
+	$.newFormWindow.add(doneButtonView);
+	
+	// ADD EVENT LISTENERS
+	doneButtonView.addEventListener('click',function() {
+		submitButtonClicked();
+	});
+	
+	$.newFormWindow.backgroundColor = 'black';
+	$.tableView.bottom = '50dp';
+}
+
 function submitButtonClicked() {
 	var messageString = validateForm();
 
@@ -342,7 +375,7 @@ Ti.App.addEventListener('createDateTimePicker', function(event) {
 			} else {
 				var date = datePicker.getValue();
 				day = date.getDate();
-				month = date.getMonth();
+				month = date.getMonth() + 1;
 				year = date.getFullYear();
 				timeDialog.show();
 			}	

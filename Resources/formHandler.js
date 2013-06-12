@@ -6,8 +6,6 @@ exports.generateTemplate = function(data, tableView) {
     if (null != talkiviFormItemSet) {
         for (var i = 0; talkiviFormItemSet.length > i; ++i) {
             var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
-            tableViewRow.backgroundColor = "black";
-            tableViewRow.color = "white";
             tableViewRows.push(tableViewRow);
         }
         tableView.data = tableViewRows;
