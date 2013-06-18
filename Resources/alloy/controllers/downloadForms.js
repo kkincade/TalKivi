@@ -23,10 +23,6 @@ function Controller() {
                     backgroundSelectedColor: "gray",
                     rowID: templatesFromJSON[i].rowid
                 });
-                $.downloadTemplatesWindow.backgroundColor = "black";
-                singleTemplate.label.color = "white";
-                singleTemplate.backgroundColor = "black";
-                singleTemplate.rightImage = path + "plus_icon_android.png";
                 if (-1 != Ti.App.Properties.getList("activeTemplates").indexOf(templatesFromJSON[i].name)) {
                     label.color = "gray";
                     singleTemplate.selectedColor = "white";
@@ -89,7 +85,9 @@ function Controller() {
     _.extend($, $.__views);
     $.downloadTemplatesWindow.modal = true;
     $.downloadTemplatesWindow.open();
-    var path = Titanium.Filesystem.resourcesDirectory;
+    {
+        Titanium.Filesystem.resourcesDirectory;
+    }
     loadTemplates();
     $.downloadTemplatesWindow.addEventListener("androidback", function() {
         $.downloadTemplatesWindow.close();

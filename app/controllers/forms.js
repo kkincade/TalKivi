@@ -1,6 +1,40 @@
+
 if (OS_ANDROID) {
-	$.formsTab.icon = "list_android.png";
+	$.formsTab.icon = "list_android.png"; // Change tab icon for android
+	
+	// Create download forms button
+	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+	var height = Math.round(Ti.Platform.displayCaps.platformHeight*0.055);
+	var width = spacer-4;
+
+	// Custom Button
+	var downloadFormsButtonView = Ti.UI.createView({
+	    width: width,
+	    height: height,
+	    left: '2dp',
+	    bottom: '2dp',
+	    backgroundColor: '#333',
+	    borderRadius: '2dp'
+	});
+	var downloadFormsButtonLabel = Ti.UI.createLabel({
+	    text:'Download Forms',
+	    font: {
+	    	fontSize: '14dp'
+	    },
+	    color:'#FFF'
+	});
+	downloadFormsButtonView.add(downloadFormsButtonLabel);
+	$.formsWindow.add(downloadFormsButtonView);
+	
+	// ADD EVENT LISTENERS
+	downloadFormsButtonView.addEventListener('click',function() {
+		addTemplatesButtonClicked();
+	});
+	
+	$.formsWindow.backgroundColor = 'black';
+	$.templatesTableView.bottom = '50dp';
 }
+
 
 Ti.App.addEventListener('populateTemplates', function() {
 	var activeTemplates = Ti.App.Properties.getList("activeTemplates");

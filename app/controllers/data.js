@@ -117,7 +117,7 @@ function toggleView() {
 
 // Creates an editForm window when a form is clicked
 $.completedFormsTableView.addEventListener('click', function(event) {
-	var controller = Alloy.createController('editForm', { formID: event.rowData.label.text }).getView();
+	var controller = Alloy.createController('editForm', { formID: event.rowData.TDP_id }).getView();
 	$.dataTab.open(controller);
 });
 
@@ -130,13 +130,14 @@ function loadFormsIntoList() {
 		// Create Label
 		var label = Ti.UI.createLabel({
 			id: i,
-			text: completedForms[i],
+			text: Ti.App.Properties.getObject(completedForms[i]).displayName,
 			color: 'black'
 		});
 		
 		// Create template
 		var formTableViewRow = Ti.UI.createTableViewRow({
 			id: i,
+			TDP_id: Ti.App.Properties.getObject(completedForms[i]).TDP_id,
 			label: label,
 			height: '40dp',
 			backgroundColor: 'white',
@@ -190,7 +191,6 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 
 function plotPointsOnMap() {
 	var completedForms = Ti.App.Properties.getList("completedForms");
-	
 	var annotations = [];
 	
 	for (var i = 0; i < completedForms.length; ++i) {
@@ -210,12 +210,11 @@ function plotPointsOnMap() {
 			var newAnnotation = Ti.Map.createAnnotation({
 				latitude: completedForm.fields[index].latitude,
 				longitude: completedForm.fields[index].longitude,
-				title: completedForm.TDP_id,
-				// subTitle: maybe,
+				title: completedForm.displayName,
 				pincolor: Ti.Map.ANNOTATION_RED,
 				animate: true
 			});
-			
+
 			annotations.push(newAnnotation);
 		}
 	}
@@ -227,7 +226,7 @@ function plotPointsOnMap() {
 // Deletes a completed form from local persistence
 function deleteForm(event) {
 	var forms = Ti.App.Properties.getList("completedForms");
-	forms.splice(forms.indexOf(event.rowData.label.text), 1);
+	forms.splice(forms.indexOf(event.rowData.TDP_id), 1);
 	Ti.App.Properties.setList("completedForms", forms);
 }
 

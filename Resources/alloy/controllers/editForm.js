@@ -37,8 +37,21 @@ function Controller() {
     }
     function loadTemplate() {
         var form = Ti.App.Properties.getObject(formID);
-        var template = Ti.App.Properties.getObject(form.formName);
-        formHandler.generateTemplate(template, $.tableView);
+        var data = Ti.App.Properties.getObject(form.formName);
+        talkiviFormItemSet = data.talkiviFormItemSet;
+        tableViewRows = [];
+        if (null != talkiviFormItemSet) {
+            for (var i = 0; talkiviFormItemSet.length > i; ++i) {
+                var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
+                tableViewRows.push(tableViewRow);
+            }
+            $.tableView.data = tableViewRows;
+        } else {
+            var alertDialog = Ti.UI.createAlertDialog({
+                message: "Invalid form! Form doesn't contain a TalKivi form item set!"
+            });
+            alertDialog.show();
+        }
         var tableViewRows = $.tableView.data[0].rows;
         for (var i = 0; tableViewRows.length > i; ++i) {
             var value = form.fields[i];
@@ -65,7 +78,7 @@ function Controller() {
         return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
     }
     function setFieldValue(tableViewRow, value) {
-        "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value = value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : tableViewRow.fieldObject.textField = value;
+        "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value = value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = "(" + value.latitude + ", " + value.longitude + ") - " + value.elevation + "m" : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value = value : tableViewRow.fieldObject.textField = value;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -78,51 +91,23 @@ function Controller() {
         id: "editFormWindow"
     });
     $.__views.editFormWindow && $.addTopLevelView($.__views.editFormWindow);
+    $.__views.saveButton = Ti.UI.createButton({
+        id: "saveButton",
+        title: "Save",
+        style: Ti.UI.iPhone.SystemButtonStyle.DONE
+    });
+    saveButtonClicked ? $.__views.saveButton.addEventListener("click", saveButtonClicked) : __defers["$.__views.saveButton!click!saveButtonClicked"] = true;
+    $.__views.editFormWindow.rightNavButton = $.__views.saveButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.editFormWindow.add($.__views.tableView);
-    $.__views.editFormWindow.activity.onCreateOptionsMenu = function(e) {
-        var __alloyId7 = {
-            title: "Save Form",
-            id: "__alloyId6"
-        };
-        $.__views.__alloyId6 = e.menu.add(_.pick(__alloyId7, Alloy.Android.menuItemCreateArgs));
-        $.__views.__alloyId6.applyProperties(_.omit(__alloyId7, Alloy.Android.menuItemCreateArgs));
-        submitFormButtonClicked ? $.__views.__alloyId6.addEventListener("click", submitFormButtonClicked) : __defers["$.__views.__alloyId6!click!submitFormButtonClicked"] = true;
-    };
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var formHandler = require("formHandler");
+    var fieldHandler = require("fieldHandler");
     var formID = arguments[0].formID;
-    $.editFormWindow.title = formID;
-    $.editFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
+    $.editFormWindow.title = Ti.App.Properties.getObject(formID).displayName;
     loadTemplate();
-    var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
-    var height = Math.round(.055 * Ti.Platform.displayCaps.platformHeight);
-    var width = spacer - 4;
-    var saveButtonView = Ti.UI.createView({
-        width: width,
-        height: height,
-        left: "2dp",
-        bottom: "2dp",
-        backgroundColor: "#333",
-        borderRadius: "2dp"
-    });
-    var saveButtonLabel = Ti.UI.createLabel({
-        text: "Save Form",
-        font: {
-            fontSize: "14dp"
-        },
-        color: "#FFF"
-    });
-    saveButtonView.add(saveButtonLabel);
-    $.editFormWindow.add(saveButtonView);
-    saveButtonView.addEventListener("click", function() {
-        saveButtonClicked();
-    });
-    $.editFormWindow.backgroundColor = "black";
-    $.tableView.bottom = "50dp";
     $.tableView.addEventListener("longpress", function(event) {
         if ("" != event.rowData.fieldObject.help_text) var alertDialog = Ti.UI.createAlertDialog({
             title: event.rowData.fieldObject.prompt,

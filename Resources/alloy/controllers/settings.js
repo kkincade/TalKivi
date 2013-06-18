@@ -8,11 +8,11 @@ function Controller() {
         id: "settingsWindow",
         title: "Settings"
     });
-    $.__views.__alloyId19 = Ti.UI.createLabel({
+    $.__views.__alloyId15 = Ti.UI.createLabel({
         text: "Settings",
-        id: "__alloyId19"
+        id: "__alloyId15"
     });
-    $.__views.settingsWindow.add($.__views.__alloyId19);
+    $.__views.settingsWindow.add($.__views.__alloyId15);
     $.__views.settingsTab = Ti.UI.createTab({
         window: $.__views.settingsWindow,
         id: "settingsTab",
@@ -22,7 +22,6 @@ function Controller() {
     $.__views.settingsTab && $.addTopLevelView($.__views.settingsTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    $.settingsTab.icon = "cog_wheel_android.png";
     _.extend($, exports);
 }
 

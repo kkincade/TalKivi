@@ -1,16 +1,13 @@
 var fieldHandler = require('fieldHandler'); // Require library
+var uploadHandler = require('uploadHandler');
 var formName = arguments[0].formName; //Get form name from function (arguments[0] is alloy's way of passing arguments)
 $.newFormWindow.title = formName; // Set title of window
-
-// Needed to keep focus on text field within table view rows when they are clicked
-if (OS_ANDROID) {
-	$.newFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
-}
-
-
 loadTemplate();
 
 if (OS_ANDROID) {
+	// Needed to keep focus on text field within table view rows when they are clicked
+	$.newFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
+	
 	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
 	var height = Math.round(Ti.Platform.displayCaps.platformHeight*0.055);
 	var width = spacer-4;
@@ -66,13 +63,15 @@ function submitForm() {
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
 	
-	// var originalForm = Ti.App.Properties.getObject(form.formName);
-		// for (var i = 0; i < originalForm.talkiviFormItemSet.length; i++) {
-			// if (talkiviFormItemSet[i].talkiviField.field_type == "Location") {
-				// index = i;
-				// break;
-			// }
-		// }
+	var index = null;
+	var originalForm = Ti.App.Properties.getObject(formName);
+		for (var i = 0; i < originalForm.talkiviFormItemSet.length; i++) {
+			if (talkiviFormItemSet[i].talkiviField.name == "Name") {
+				index = i;
+				break;
+			}
+		}
+
 	var form = {
 		TDP_id: "TDP_" + TDP_id,
 		formName: formName,
@@ -91,9 +90,18 @@ function submitForm() {
 	}
 	
 	form.fields = tempFields;
+
+	if (index != null) {
+		form.displayName = form.fields[index];
+	} else {
+		form.displayName = form.TDP_id;
+	}
+	
 	Ti.App.Properties.setObject(form.TDP_id, form);
 	completedForms.push(form.TDP_id);
 	Ti.App.Properties.setList("completedForms", completedForms);
+	
+	uploadHandler.uploadForm(form.TDP_id);
 }
 
 
@@ -538,10 +546,12 @@ function getFieldValue(tableViewRow) {
 		var textLocation = tableViewRow.textField.value;
 		var commaIndex = textLocation.indexOf(',');
 		var closingParenIndex = textLocation.indexOf(')');
+		var mIndex = textLocation.indexOf('m');
+		
 		var latitude = textLocation.substring(1, commaIndex);
 		var longitude = textLocation.substring(commaIndex + 2, closingParenIndex);
-		var elevation = textLocation.substring(closingParenIndex + 3, -2);
-		
+		var elevation = textLocation.substring(closingParenIndex + 3, mIndex);
+
 		var location = {
 			latitude: latitude,
 			longitude: longitude,

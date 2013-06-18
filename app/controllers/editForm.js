@@ -1,6 +1,6 @@
-var formHandler = require('formHandler'); // Require library
-var formID = arguments[0].formID; //Get form name from function (arguments[0] is alloy's way of passing arguments)
-$.editFormWindow.title = formID; // Set title of window
+var fieldHandler = require('fieldHandler'); // Require library
+var formID = arguments[0].formID; //Get form id from function (arguments[0] is alloy's way of passing arguments)
+$.editFormWindow.title = Ti.App.Properties.getObject(formID).displayName; // Set title of window
 
 // Needed to keep focus on text field within table view rows when they are clicked
 if (OS_ANDROID) {
@@ -81,12 +81,30 @@ function saveForm() {
 }
 
 
-// When a template is selected,
+// When a form is selected for editing, this loads the field values
 function loadTemplate() {
-	// Load in template to use and the form to get the values to display in the form
 	var form = Ti.App.Properties.getObject(formID);
-	var template = Ti.App.Properties.getObject(form.formName);
-	formHandler.generateTemplate(template, $.tableView);
+	var data = Ti.App.Properties.getObject(form.formName);
+	talkiviFormItemSet = data.talkiviFormItemSet;
+	tableViewRows = [];
+	
+	if (talkiviFormItemSet != null) {
+		for (var i = 0; i < talkiviFormItemSet.length; ++i) {
+			var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
+			if (OS_ANDROID) {
+				tableViewRow.backgroundColor = 'black';
+				tableViewRow.color = 'white';
+			}
+			tableViewRows.push(tableViewRow);
+		}
+		$.tableView.data = tableViewRows;
+	} else {
+		var alertDialog = Ti.UI.createAlertDialog({
+			message: "Invalid form! Form doesn't contain a TalKivi form item set!"
+		});
+		alertDialog.show();
+	}
+	
 	var tableViewRows = $.tableView.data[0].rows;
 	
 	// Set the values to display
@@ -258,7 +276,7 @@ function setFieldValue(tableViewRow, value) {
 	else if (tableViewRow.fieldObject.field_type == 'Time') { tableViewRow.textField.value = value }
 	else if (tableViewRow.fieldObject.field_type == 'Date-Time') { tableViewRow.textField.value = value }
 	else if (tableViewRow.fieldObject.field_type == 'Message') { tableViewRow.textField.value = value }
-	else if (tableViewRow.fieldObject.field_type == 'Location') { tableViewRow.textField.value = value }
+	else if (tableViewRow.fieldObject.field_type == 'Location') { tableViewRow.textField.value = "(" + value.latitude + ", " + value.longitude + ") - " + value.elevation + "m" }
 	else if (tableViewRow.fieldObject.field_type == 'Photo') { tableViewRow.textField.value = value }
 	else if (tableViewRow.fieldObject.field_type == 'Recording') { tableViewRow.textField.value = value }
 	else if (tableViewRow.fieldObject.field_type == 'Selection') { tableViewRow.textField.value = value }

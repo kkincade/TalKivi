@@ -7,27 +7,29 @@ function Controller() {
     $.__views.index = Ti.UI.createTabGroup({
         id: "index"
     });
-    $.__views.__alloyId15 = Alloy.createController("forms", {
-        id: "__alloyId15"
+    $.__views.__alloyId11 = Alloy.createController("forms", {
+        id: "__alloyId11"
     });
-    $.__views.index.addTab($.__views.__alloyId15.getViewEx({
+    $.__views.index.addTab($.__views.__alloyId11.getViewEx({
         recurse: true
     }));
-    $.__views.__alloyId16 = Alloy.createController("data", {
-        id: "__alloyId16"
+    $.__views.__alloyId12 = Alloy.createController("data", {
+        id: "__alloyId12"
     });
-    $.__views.index.addTab($.__views.__alloyId16.getViewEx({
+    $.__views.index.addTab($.__views.__alloyId12.getViewEx({
         recurse: true
     }));
-    $.__views.__alloyId17 = Alloy.createController("settings", {
-        id: "__alloyId17"
+    $.__views.__alloyId13 = Alloy.createController("settings", {
+        id: "__alloyId13"
     });
-    $.__views.index.addTab($.__views.__alloyId17.getViewEx({
+    $.__views.index.addTab($.__views.__alloyId13.getViewEx({
         recurse: true
     }));
     $.__views.index && $.addTopLevelView($.__views.index);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    Ti.App.Properties.removeProperty("activeTemplates");
+    Ti.App.Properties.removeProperty("completedForms");
     null == Ti.App.Properties.getList("activeTemplates") && Ti.App.Properties.setList("activeTemplates", []);
     null == Ti.App.Properties.getList("completedForms") && Ti.App.Properties.setList("completedForms", []);
     null == Ti.App.Properties.getList("settings") && Ti.App.Properties.setList("settings", []);

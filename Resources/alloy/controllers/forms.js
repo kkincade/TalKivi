@@ -7,32 +7,45 @@ function Controller() {
     function addTemplatesButtonClicked() {
         $.downloadForms = Alloy.createController("downloadForms");
     }
-    function editTemplatesButtonClicked() {}
+    function editTemplatesButtonClicked() {
+        if ($.templatesTableView.editing) {
+            $.editTemplatesButton.title = "Edit";
+            $.addTemplatesButton.enabled = true;
+            $.templatesTableView.editing = false;
+        } else if ($.templatesTableView.sections.length > 0) {
+            $.editTemplatesButton.title = "Done";
+            $.addTemplatesButton.enabled = false;
+            $.templatesTableView.editing = true;
+        }
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
     var $ = this;
     var exports = {};
     var __defers = {};
-    $.__views.navGroupWindow = Ti.UI.createWindow({
-        id: "navGroupWindow",
+    $.__views.formsWindow = Ti.UI.createWindow({
+        id: "formsWindow",
         title: "Forms"
     });
+    $.__views.addTemplatesButton = Ti.UI.createButton({
+        id: "addTemplatesButton",
+        title: "Add"
+    });
+    addTemplatesButtonClicked ? $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked) : __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] = true;
+    $.__views.formsWindow.rightNavButton = $.__views.addTemplatesButton;
+    $.__views.editTemplatesButton = Ti.UI.createButton({
+        id: "editTemplatesButton",
+        title: "Edit"
+    });
+    editTemplatesButtonClicked ? $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked) : __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] = true;
+    $.__views.formsWindow.leftNavButton = $.__views.editTemplatesButton;
     $.__views.templatesTableView = Ti.UI.createTableView({
         id: "templatesTableView"
     });
-    $.__views.navGroupWindow.add($.__views.templatesTableView);
-    $.__views.navGroupWindow.activity.onCreateOptionsMenu = function(e) {
-        var __alloyId13 = {
-            title: "Download Forms",
-            id: "__alloyId12"
-        };
-        $.__views.__alloyId12 = e.menu.add(_.pick(__alloyId13, Alloy.Android.menuItemCreateArgs));
-        $.__views.__alloyId12.applyProperties(_.omit(__alloyId13, Alloy.Android.menuItemCreateArgs));
-        addTemplatesButtonClicked ? $.__views.__alloyId12.addEventListener("click", addTemplatesButtonClicked) : __defers["$.__views.__alloyId12!click!addTemplatesButtonClicked"] = true;
-    };
+    $.__views.formsWindow.add($.__views.templatesTableView);
     $.__views.formsTab = Ti.UI.createTab({
-        window: $.__views.navGroupWindow,
+        window: $.__views.formsWindow,
         id: "formsTab",
         title: "Forms",
         icon: "list_ios.png"
@@ -40,7 +53,6 @@ function Controller() {
     $.__views.formsTab && $.addTopLevelView($.__views.formsTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    $.formsTab.icon = "list_android.png";
     Ti.App.addEventListener("populateTemplates", function() {
         var activeTemplates = Ti.App.Properties.getList("activeTemplates");
         var templates = [];
@@ -58,9 +70,6 @@ function Controller() {
                 hasDetail: true,
                 backgroundSelectedColor: "gray"
             });
-            singleTemplate.label.color = "white";
-            singleTemplate.backgroundColor = "black";
-            singleTemplate.hasChild = true;
             singleTemplate.add(label);
             templates.push(singleTemplate);
         }
@@ -78,23 +87,9 @@ function Controller() {
         deleteTemplate(event);
     });
     $.templatesTableView.addEventListener("longpress", function(event) {
-        if (null != event.rowData) {
-            var dialog = Ti.UI.createAlertDialog({
-                message: "Delete " + event.rowData.label.text + "?",
-                buttonNames: [ "Delete", "Cancel" ]
-            });
-            dialog.addEventListener("click", function(e) {
-                if (0 == e.index) {
-                    deleteTemplate(event);
-                    Ti.App.fireEvent("populateTemplates");
-                }
-            });
-            dialog.show();
-        }
     });
     __defers["$.__views.addTemplatesButton!click!addTemplatesButtonClicked"] && $.__views.addTemplatesButton.addEventListener("click", addTemplatesButtonClicked);
     __defers["$.__views.editTemplatesButton!click!editTemplatesButtonClicked"] && $.__views.editTemplatesButton.addEventListener("click", editTemplatesButtonClicked);
-    __defers["$.__views.__alloyId12!click!addTemplatesButtonClicked"] && $.__views.__alloyId12.addEventListener("click", addTemplatesButtonClicked);
     _.extend($, exports);
 }
 

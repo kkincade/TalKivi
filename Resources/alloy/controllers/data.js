@@ -14,11 +14,12 @@ function Controller() {
         for (var i = 0; completedForms.length > i; ++i) {
             var label = Ti.UI.createLabel({
                 id: i,
-                text: completedForms[i],
+                text: Ti.App.Properties.getObject(completedForms[i]).displayName,
                 color: "black"
             });
             var formTableViewRow = Ti.UI.createTableViewRow({
                 id: i,
+                TDP_id: Ti.App.Properties.getObject(completedForms[i]).TDP_id,
                 label: label,
                 height: "40dp",
                 backgroundColor: "white",
@@ -26,9 +27,6 @@ function Controller() {
                 backgroundSelectedColor: "gray",
                 className: "someTableViewRow"
             });
-            formTableViewRow.label.color = "white";
-            formTableViewRow.backgroundColor = "black";
-            formTableViewRow.hasChild = true;
             formTableViewRow.add(label);
             formsToDisplay.push(formTableViewRow);
         }
@@ -51,7 +49,7 @@ function Controller() {
                 var newAnnotation = Ti.Map.createAnnotation({
                     latitude: completedForm.fields[index].latitude,
                     longitude: completedForm.fields[index].longitude,
-                    title: completedForm.TDP_id,
+                    title: completedForm.displayName,
                     pincolor: Ti.Map.ANNOTATION_RED,
                     animate: true
                 });
@@ -62,10 +60,18 @@ function Controller() {
     }
     function deleteForm(event) {
         var forms = Ti.App.Properties.getList("completedForms");
-        forms.splice(forms.indexOf(event.rowData.label.text), 1);
+        forms.splice(forms.indexOf(event.rowData.TDP_id), 1);
         Ti.App.Properties.setList("completedForms", forms);
     }
-    function editFormsButtonClicked() {}
+    function editFormsButtonClicked() {
+        if ($.completedFormsTableView.editing) {
+            $.editFormsButton.title = "Edit";
+            $.completedFormsTableView.editing = false;
+        } else if ($.completedFormsTableView.sections.length > 0) {
+            $.editFormsButton.title = "Done";
+            $.completedFormsTableView.editing = true;
+        }
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
@@ -75,6 +81,12 @@ function Controller() {
     $.__views.dataWindow = Ti.UI.createWindow({
         id: "dataWindow"
     });
+    $.__views.editFormsButton = Ti.UI.createButton({
+        id: "editFormsButton",
+        title: "Edit"
+    });
+    editFormsButtonClicked ? $.__views.editFormsButton.addEventListener("click", editFormsButtonClicked) : __defers["$.__views.editFormsButton!click!editFormsButtonClicked"] = true;
+    $.__views.dataWindow.leftNavButton = $.__views.editFormsButton;
     $.__views.completedFormsTableView = Ti.UI.createTableView({
         id: "completedFormsTableView",
         visible: "true"
@@ -102,74 +114,25 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     $.mapView.visible = false;
-    $.mapView.bottom = "55dp";
-    $.dataTab.icon = "globe_android.png";
     $.dataTab.addEventListener("focus", function() {
         loadFormsIntoList();
         plotPointsOnMap();
     });
-    var spacer = Math.round(.5 * Ti.Platform.displayCaps.platformWidth);
-    var height = Math.round(.055 * Ti.Platform.displayCaps.platformHeight);
-    var width = spacer - 4;
-    var tabBar = Ti.UI.createView({
-        width: Ti.Platform.displayCaps.platformWidth,
-        height: height,
-        left: "0dp",
-        bottom: "0dp",
-        backgroundColor: "transparent"
+    var tabbedBar = Ti.UI.iOS.createTabbedBar({
+        labels: [ "List", "Map" ],
+        index: "0dp",
+        top: "50dp",
+        style: Titanium.UI.iPhone.SystemButtonStyle.BAR,
+        height: "25dp",
+        width: "150dp"
     });
-    $.dataWindow.add(tabBar);
-    var listViewTab = Ti.UI.createView({
-        width: width,
-        height: height,
-        left: "2dp",
-        bottom: "2dp",
-        backgroundColor: "#333",
-        borderRadius: "2dp"
+    tabbedBar.addEventListener("click", function() {
+        toggleView();
     });
-    var listViewTabLabel = Ti.UI.createLabel({
-        text: "List View",
-        color: "#FFF"
-    });
-    listViewTab.add(listViewTabLabel);
-    $.dataWindow.add(listViewTab);
-    var mapViewTab = Ti.UI.createView({
-        width: width,
-        height: height,
-        left: spacer,
-        bottom: "2dp",
-        backgroundColor: "#000"
-    });
-    var mapViewTabLabel = Ti.UI.createLabel({
-        text: "Map View",
-        color: "#777"
-    });
-    mapViewTab.add(mapViewTabLabel);
-    $.dataWindow.add(mapViewTab);
-    var currTab = listViewTab;
-    listViewTab.addEventListener("click", function() {
-        if (currTab != this) {
-            currTab.backgroundColor = "#000";
-            currTab.children[0].color = "#777";
-            this.backgroundColor = "#333";
-            this.children[0].color = "#FFF";
-            currTab = this;
-            toggleView();
-        }
-    });
-    mapViewTab.addEventListener("click", function() {
-        if (currTab != this) {
-            currTab.backgroundColor = "#000";
-            currTab.children[0].color = "#777";
-            this.backgroundColor = "#333";
-            this.children[0].color = "#FFF";
-            currTab = this;
-            toggleView();
-        }
-    });
+    $.dataWindow.setTitleControl(tabbedBar);
     $.completedFormsTableView.addEventListener("click", function(event) {
         var controller = Alloy.createController("editForm", {
-            formID: event.rowData.label.text
+            formID: event.rowData.TDP_id
         }).getView();
         $.dataTab.open(controller);
     });
@@ -178,19 +141,6 @@ function Controller() {
         loadFormsIntoList();
     });
     $.completedFormsTableView.addEventListener("longpress", function(event) {
-        if (null != event.rowData) {
-            var dialog = Ti.UI.createAlertDialog({
-                message: "Delete " + event.rowData.label.text + "?",
-                buttonNames: [ "Delete", "Cancel" ]
-            });
-            dialog.addEventListener("click", function(e) {
-                if (0 == e.index) {
-                    deleteForm(event);
-                    loadFormsIntoList();
-                }
-            });
-            dialog.show();
-        }
     });
     __defers["$.__views.editFormsButton!click!editFormsButtonClicked"] && $.__views.editFormsButton.addEventListener("click", editFormsButtonClicked);
     _.extend($, exports);

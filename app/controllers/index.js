@@ -1,4 +1,5 @@
-// Ti.App.Properties.removeProperty("activeTemplates");
+Ti.App.Properties.removeProperty("activeTemplates");
+Ti.App.Properties.removeProperty("completedForms");
 // Setup persistence for downloaded forms (The only time these are null is on the first launch of the application)
 if (Ti.App.Properties.getList("activeTemplates") == null) {
 	Ti.App.Properties.setList("activeTemplates", []);
