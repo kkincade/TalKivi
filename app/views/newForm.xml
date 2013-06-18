@@ -4,6 +4,5 @@
 			<Button id="submitButton" title="Submit" style="Ti.UI.iPhone.SystemButtonStyle.DONE" onClick="submitButtonClicked"/>
 		</RightNavButton>	
 		<TableView id="tableView"/>
-		<!-- <Button id="submitButton" platform='android' bottom="5dp" title='Submit Form' onClick="submitButtonClicked"/> -->
 	</Window>
 </Alloy>

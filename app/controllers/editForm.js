@@ -2,19 +2,59 @@ var formHandler = require('formHandler'); // Require library
 var formID = arguments[0].formID; //Get form name from function (arguments[0] is alloy's way of passing arguments)
 $.editFormWindow.title = formID; // Set title of window
 
+// Needed to keep focus on text field within table view rows when they are clicked
+if (OS_ANDROID) {
+	$.editFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
+}
+
 loadTemplate();
+
+if (OS_ANDROID) {
+	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+	var height = Math.round(Ti.Platform.displayCaps.platformHeight*0.055);
+	var width = spacer-4;
+
+	// Custom Button
+	var saveButtonView = Ti.UI.createView({
+	    width: width,
+	    height: height,
+	    left: '2dp',
+	    bottom: '2dp',
+	    backgroundColor: '#333',
+	    borderRadius: '2dp'
+	});
+	var saveButtonLabel = Ti.UI.createLabel({
+	    text:'Save Form',
+	    font: {
+	    	fontSize: '14dp'
+	    },
+	    color:'#FFF'
+	});
+	saveButtonView.add(saveButtonLabel);
+	$.editFormWindow.add(saveButtonView);
+	
+	// ADD EVENT LISTENERS
+	saveButtonView.addEventListener('click',function() {
+		saveButtonClicked();
+	});
+	
+	$.editFormWindow.backgroundColor = 'black';
+	$.tableView.bottom = '50dp';
+}
+
 
 function saveButtonClicked() {
 	var messageString = validateForm();
 	
 	if (messageString == "") {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form saved successfully" });
-		alertDialog.show();
 		saveForm();
-		//Ti.App.fireEvent('loadFormsIntoList');
-		$.editFormWindow.close();
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form saved successfully", buttonNames: ['OK'] });
+		alertDialog.addEventListener('click', function(e) {
+			$.editFormWindow.close();
+		});
+		alertDialog.show();
 	} else {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString, buttonNames: ['OK'] });
 		alertDialog.show();
 	}
 }
@@ -23,7 +63,7 @@ function saveButtonClicked() {
 function saveForm() {
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var form = Ti.App.Properties.getObject(formID);
-	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out (Don't put in for loop!)
 	
 	tempFields = [];
 	// Construct the form object we are going to save
@@ -39,6 +79,7 @@ function saveForm() {
 	}
 	Ti.App.Properties.setList("completedForms", completedForms);
 }
+
 
 // When a template is selected,
 function loadTemplate() {
@@ -72,6 +113,7 @@ $.tableView.addEventListener('longpress', function(event) {
 	
 	alertDialog.show();
 });
+
 
 // Android uses the back button instead of the done button
 $.tableView.addEventListener('androidback', function(event) { 
@@ -203,6 +245,7 @@ function getFieldValue(tableViewRow) {
 	else if (tableViewRow.fieldObject.field_type == 'Structural Attitude') { return tableViewRow.textField.value }
 	else { return tableViewRow.fieldObject.textField }
 }
+
 
 function setFieldValue(tableViewRow, value) {
 	if (tableViewRow.fieldObject.field_type == 'Text') { tableViewRow.textField.value = value } 

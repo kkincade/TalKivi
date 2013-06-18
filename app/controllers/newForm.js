@@ -1,16 +1,22 @@
-var formHandler = require('formHandler'); // Require library
+var fieldHandler = require('fieldHandler'); // Require library
 var formName = arguments[0].formName; //Get form name from function (arguments[0] is alloy's way of passing arguments)
 $.newFormWindow.title = formName; // Set title of window
+
+// Needed to keep focus on text field within table view rows when they are clicked
+if (OS_ANDROID) {
+	$.newFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
+}
+
 
 loadTemplate();
 
 if (OS_ANDROID) {
 	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+	var height = Math.round(Ti.Platform.displayCaps.platformHeight*0.055);
 	var width = spacer-4;
-	var height = '55dp';
 	
 	// Custom Button
-	var doneButtonView = Ti.UI.createView({
+	var submitButtonView = Ti.UI.createView({
 	    width: width,
 	    height: height,
 	    left: '2dp',
@@ -18,18 +24,18 @@ if (OS_ANDROID) {
 	    backgroundColor: '#333',
 	    borderRadius: '2dp'
 	});
-	var doneButtonLabel = Ti.UI.createLabel({
+	var submitButtonLabel = Ti.UI.createLabel({
 	    text:'Submit Form',
 	    font: {
 	    	fontSize: '14dp'
 	    },
 	    color:'#FFF'
 	});
-	doneButtonView.add(doneButtonLabel);
-	$.newFormWindow.add(doneButtonView);
+	submitButtonView.add(submitButtonLabel);
+	$.newFormWindow.add(submitButtonView);
 	
 	// ADD EVENT LISTENERS
-	doneButtonView.addEventListener('click',function() {
+	submitButtonView.addEventListener('click',function() {
 		submitButtonClicked();
 	});
 	
@@ -37,16 +43,20 @@ if (OS_ANDROID) {
 	$.tableView.bottom = '50dp';
 }
 
+
 function submitButtonClicked() {
 	var messageString = validateForm();
 
 	if (messageString == "") {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully" });
-		alertDialog.show();
 		submitForm();
-		$.newFormWindow.close();
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Success!", message: "Form submitted successfully", buttonNames: ['OK'] });
+		alertDialog.addEventListener('click', function(e) {
+			$.newFormWindow.close();
+		});
+		alertDialog.show();
+
 	} else {
-		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString });
+		var alertDialog = Ti.UI.createAlertDialog({ title: "Invalid Input", message: messageString, buttonNames: ['OK'] });
 		alertDialog.show();
 	}
 }
@@ -56,6 +66,13 @@ function submitForm() {
 	var completedForms = Ti.App.Properties.getList("completedForms");
 	var TDP_id = Ti.App.Properties.getInt("TDP_INCREMENT");
 	
+	// var originalForm = Ti.App.Properties.getObject(form.formName);
+		// for (var i = 0; i < originalForm.talkiviFormItemSet.length; i++) {
+			// if (talkiviFormItemSet[i].talkiviField.field_type == "Location") {
+				// index = i;
+				// break;
+			// }
+		// }
 	var form = {
 		TDP_id: "TDP_" + TDP_id,
 		formName: formName,
@@ -64,7 +81,7 @@ function submitForm() {
 	
 	++TDP_id;
 	Ti.App.Properties.setInt("TDP_INCREMENT", TDP_id);
-	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out (Don't put in for loop!)
 	
 	tempFields = [];
 	// Construct the form object we are going to save
@@ -79,10 +96,29 @@ function submitForm() {
 	Ti.App.Properties.setList("completedForms", completedForms);
 }
 
-// When a template is selected,
-function loadTemplate(event) {
-	var template = Ti.App.Properties.getObject(formName);
-	formHandler.generateTemplate(template, $.tableView);
+
+// generateForm function, takes json data for form and a view to add views to
+function loadTemplate() {
+	var data = Ti.App.Properties.getObject(formName);
+	
+	talkiviFormItemSet = data.talkiviFormItemSet;
+	tableViewRows = [];
+	if (talkiviFormItemSet != null) {
+		for (var i = 0; i < talkiviFormItemSet.length; ++i) {
+			var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
+			if (OS_ANDROID) {
+				tableViewRow.backgroundColor = 'black';
+				tableViewRow.color = 'white';
+			}
+			tableViewRows.push(tableViewRow);
+		}
+		$.tableView.data = tableViewRows;
+	} else {
+		var alertDialog = Ti.UI.createAlertDialog({
+			message: "Invalid form! Form doesn't contain a TalKivi form item set!"
+		});
+		alertDialog.show();
+	}
 }
 
 
@@ -394,14 +430,14 @@ Ti.App.addEventListener('createDateTimePicker', function(event) {
 // Loop over every row in table view and validate the contents
 function validateForm() {
 	var messageString = ""; // Start with blank error message
-	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out
+	var tableViewRows = $.tableView.data[0].rows; // Needs to be like this or Android freaks out (Don't put in for loop!)
 	
 	for (var i = 0; i < tableViewRows.length; i++) {
 		fieldObject = tableViewRows[i].fieldObject;
 		value = getFieldValue(tableViewRows[i]);
 		
-		// Checks if the field is blank and/or required
-		if (value == "" || value == null) {
+		// Checks if the field is blank and/or required (has to be === to compare booleans with "" and null)
+		if (value === "" || value === null) {
 			if (fieldObject.required == "No") {
 				continue;
 			} else {
@@ -417,7 +453,6 @@ function validateForm() {
  		// -------------- Checkbox ----------------
  		} else if (fieldObject.field_type == 'Checkbox') { 
  			// Do Nothing	
- 		
  		
  		// ------------ Integer ----------------
  		} else if (fieldObject.field_type == 'Integer') { 
@@ -460,7 +495,6 @@ function validateForm() {
 		// -------------- Time ----------------
 		} else if (fieldObject.field_type == 'Time') { 
 			
-			
 		// -------------- Date-Time ----------------
 		} else if (fieldObject.field_type == 'Date-Time') { 
 		
@@ -489,21 +523,36 @@ function validateForm() {
 
 // Returns the value from the corresponding textField, switchers, etc. (Not all fields have textFields)
 function getFieldValue(tableViewRow) {
-	if (tableViewRow.fieldObject.field_type == 'Text') { return tableViewRow.textField.value } 
-	else if (tableViewRow.fieldObject.field_type == 'Checkbox') { return tableViewRow.switcher.value }
-	else if (tableViewRow.fieldObject.field_type == 'Integer') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Decimal') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Calculated') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Incremental Text') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Date') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Time') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Date-Time') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Message') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Location') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Photo') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Recording') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Selection') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Button Selection') { return tableViewRow.textField.value }
-	else if (tableViewRow.fieldObject.field_type == 'Structural Attitude') { return tableViewRow.textField.value }
+	if (tableViewRow.fieldObject.field_type == 'Text') { return tableViewRow.textField.value; } 
+	else if (tableViewRow.fieldObject.field_type == 'Checkbox') { return tableViewRow.switcher.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Integer') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Decimal') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Calculated') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Incremental Text') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Date') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Time') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Date-Time') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Message') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Location') { 
+		// Assume location is in form "(39.7494925, -105.2217889) - 1572m"
+		var textLocation = tableViewRow.textField.value;
+		var commaIndex = textLocation.indexOf(',');
+		var closingParenIndex = textLocation.indexOf(')');
+		var latitude = textLocation.substring(1, commaIndex);
+		var longitude = textLocation.substring(commaIndex + 2, closingParenIndex);
+		var elevation = textLocation.substring(closingParenIndex + 3, -2);
+		
+		var location = {
+			latitude: latitude,
+			longitude: longitude,
+			elevation: elevation
+		};
+		
+		return location;
+	} else if (tableViewRow.fieldObject.field_type == 'Photo') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Recording') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Selection') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Button Selection') { return tableViewRow.textField.value; }
+	else if (tableViewRow.fieldObject.field_type == 'Structural Attitude') { return tableViewRow.textField.value; }
 	else { return tableViewRow.fieldObject.textField }
 }

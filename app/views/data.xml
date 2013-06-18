@@ -1,5 +1,5 @@
 <Alloy>
-	<Tab id="dataTab" title="Data" icon="globe_green.png">
+	<Tab id="dataTab" title="Data" icon="globe_ios.png">
 		<Window id="dataWindow">
 	        <LeftNavButton platform='ios'>
 				<Button id="editFormsButton" title="Edit" onClick="editFormsButtonClicked"/>

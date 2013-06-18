@@ -1,5 +1,5 @@
 <Alloy>
-	<Tab id="formsTab" title="Forms" icon="kiwi.png">
+	<Tab id="formsTab" title="Forms" icon="list_ios.png">
 		<Window id="navGroupWindow" title="Forms">
 			<RightNavButton platform='ios'>
 				<Button id="addTemplatesButton" title="Add" onClick="addTemplatesButtonClicked"/>

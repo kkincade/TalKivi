@@ -1,3 +1,6 @@
+if (OS_ANDROID) {
+	$.formsTab.icon = "list_android.png";
+}
 
 Ti.App.addEventListener('populateTemplates', function() {
 	var activeTemplates = Ti.App.Properties.getList("activeTemplates");

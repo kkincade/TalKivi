@@ -17,11 +17,12 @@ function Controller() {
         window: $.__views.settingsWindow,
         id: "settingsTab",
         title: "Settings",
-        icon: "cog_wheel.png"
+        icon: "cog_wheel_ios.png"
     });
     $.__views.settingsTab && $.addTopLevelView($.__views.settingsTab);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    $.settingsTab.icon = "cog_wheel_android.png";
     _.extend($, exports);
 }
 

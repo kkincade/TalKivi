@@ -1,5 +1,5 @@
 <Alloy>
-	<Tab id="settingsTab" title="Settings" icon="cog_wheel.png">
+	<Tab id="settingsTab" title="Settings" icon="cog_wheel_ios.png">
 		<Window id="settingsWindow" title="Settings">
 			<Label>Settings</Label>
 		</Window>

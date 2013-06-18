@@ -88,9 +88,16 @@ function TextField(fieldObject) {
 
 function CheckboxField(fieldObject) {
 	
-
+	// Get default value from form and convert it to a boolean
+	var defaultValue = null;
+	if (fieldObject.default_value.toLowerCase() == "true") {
+		defaultValue = true;
+	} else {
+		defaultValue = false;
+	}
+	
 	var switcher = Ti.UI.createSwitch({
-		value: fieldObject.default_value.toLowerCase(),
+		value: defaultValue,
 		// Padding
 		height: Ti.UI.SIZE,
 		top: '10dp', 
@@ -137,6 +144,7 @@ function Integer(fieldObject) {
 		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		keyboardType: Ti.UI.KEYBOARD_NUMBER_PAD,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -200,6 +208,7 @@ function Decimal(fieldObject) {
 		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		keyboardType: Ti.UI.KEYBOARD_DECIMAL_PAD,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -262,6 +271,7 @@ function Calculated(fieldObject) {
 		value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
+		keyboardType: Ti.UI.KEYBOARD_DECIMAL_PAD,
 		
 		// Padding
 		width: Ti.UI.FILL,
@@ -668,22 +678,22 @@ function Message(fieldObject) {
 }
 
 function LocationField(fieldObject) {
-	var longitude, latitude;
+	var longitude, latitude, elevation;
 	Ti.Geolocation.purpose = "TalKivi";
 	Ti.Geolocation.getCurrentPosition( function(e) {
 		if (!e.success) {
 			alert("Could not retrieve location!");
 			return;
 		}
-		Ti.API.info("Setting location");
 		longitude = e.coords.longitude;
 		latitude = e.coords.latitude;
+		elevation = e.coords.altitude;
 	});
 	
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: latitude + ", " + longitude,
+		value: "(" + latitude + ", " + longitude + ") - " + elevation + "m",
 		//value: fieldObject.default_value,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
@@ -745,7 +755,8 @@ function Photo(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "This field type is currently not supported", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -806,7 +817,8 @@ function Recording(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "This field type is currently not supported", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -868,7 +880,8 @@ function Selection(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "This field type is currently not supported", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -930,7 +943,8 @@ function Button_Selection(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "This field type is currently not supported", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -991,7 +1005,8 @@ function Structural_Attitude(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "This field type is currently not supported", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		
@@ -1053,7 +1068,8 @@ function unknownField(fieldObject) {
 	var textField = Ti.UI.createTextField({
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_NONE,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		value: fieldObject.default_value,
+		value: "TalKivi doesn't recognize this field type.", //fieldObject.default_value,
+		editable: false,
 		clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS,
 		hintText: fieldObject.description,
 		

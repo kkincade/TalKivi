@@ -1,18 +1,27 @@
+$.mapView.visible = false;
+
+// Moving map upwards to make space for zoom in out buttons
+if (OS_ANDROID) {
+	$.mapView.bottom = '55dp';
+	$.dataTab.icon = "globe_android.png";
+}
+
+
 $.dataTab.addEventListener('focus', function(event) {
 	loadFormsIntoList();
+	plotPointsOnMap();
 });
 
-$.mapView.visible = false;
 
 // iOS
 if (OS_IOS) {
 	var tabbedBar = Ti.UI.iOS.createTabbedBar({
 		labels: ['List', 'Map'],
-		index: 0,
-	    top: 50,
+		index: '0dp',
+	    top: '50dp',
 	    style: Titanium.UI.iPhone.SystemButtonStyle.BAR,
-	    height: 25,
-	    width: 150
+	    height: '25dp',
+	    width: '150dp'
 	});
 
 	tabbedBar.addEventListener('click', function(event) {
@@ -24,20 +33,22 @@ if (OS_IOS) {
 // Android
 } else {
 	var spacer = Math.round(Ti.Platform.displayCaps.platformWidth*0.5);
+	var height = Math.round(Ti.Platform.displayCaps.platformHeight*0.055); // 1/20th-ish the height of the screen
 	var width = spacer-4;
-	var height = '36dp';
+	
  
 	// TAB BAR
 	var tabBar = Ti.UI.createView({
 	    width: Ti.Platform.displayCaps.platformWidth,
-	    height: '40dp',
+	    height: height,
 	    left: '0dp',
 	    bottom: '0dp',
 	    backgroundColor: 'transparent'
 	});
 	$.dataWindow.add(tabBar);
-	// TAB 1
-	var tab1 = Ti.UI.createView({
+	
+	// List View Tab
+	var listViewTab = Ti.UI.createView({
 	    width: width,
 	    height: height,
 	    left: '2dp',
@@ -45,31 +56,32 @@ if (OS_IOS) {
 	    backgroundColor:'#333',
 	    borderRadius: '2dp'
 	});
-	var tab1Label = Ti.UI.createLabel({
+	var listViewTabLabel = Ti.UI.createLabel({
 	    text:'List View',
 	    color:'#FFF'
 	});
-	tab1.add(tab1Label);
-	$.dataWindow.add(tab1);
-	// TAB 2
-	var tab2 = Ti.UI.createView({
+	listViewTab.add(listViewTabLabel);
+	$.dataWindow.add(listViewTab);
+	
+	// Map View Tab
+	var mapViewTab = Ti.UI.createView({
 	    width:width,
 	    height:height,
 	    left:spacer,
 	    bottom: '2dp',
 	    backgroundColor:'#000'
 	});
-	var tab2Label = Ti.UI.createLabel({
+	var mapViewTabLabel = Ti.UI.createLabel({
 	    text:'Map View',
 	    color:'#777'
 	});
-	tab2.add(tab2Label);
-	$.dataWindow.add(tab2);
+	mapViewTab.add(mapViewTabLabel);
+	$.dataWindow.add(mapViewTab);
 	 
-	var currTab = tab1;
+	var currTab = listViewTab;
 	 
 	// ADD EVENT LISTENERS
-	tab1.addEventListener('click',function() {
+	listViewTab.addEventListener('click',function() {
 		if (currTab != this) {
 		    currTab.backgroundColor = '#000';
 		    currTab.children[0].color = '#777';
@@ -79,7 +91,7 @@ if (OS_IOS) {
 		    toggleView();
 	    }
 	});
-	tab2.addEventListener('click',function() {
+	mapViewTab.addEventListener('click',function() {
 		if (currTab != this) {
 		    currTab.backgroundColor = '#000';
 		    currTab.children[0].color = '#777';
@@ -110,11 +122,8 @@ $.completedFormsTableView.addEventListener('click', function(event) {
 });
 
 
-//Ti.App.addEventListener('loadFormsIntoList', function() {
 function loadFormsIntoList() {
-	Ti.API.info("INNNNNN");
 	var completedForms = Ti.App.Properties.getList("completedForms");
-	Ti.API.info(completedForms);
 	var formsToDisplay = [];
 	
 	for (var i = 0; i < completedForms.length; ++i) {
@@ -150,13 +159,11 @@ function loadFormsIntoList() {
 	$.completedFormsTableView.editable = true;
 	$.completedFormsTableView.moveable = true;
 }
-//});
 
 
 // IOS event listener for delete button on iOS when deleting forms
 $.completedFormsTableView.addEventListener('delete', function(event) {
 	deleteForm(event);
-	//Ti.App.fireEvent('loadFormsIntoList');
 	loadFormsIntoList();
 });
 
@@ -171,8 +178,7 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 			dialog.addEventListener('click', function(e) {
 				if (e.index == 0) { // Delete
 					deleteForm(event);
-					Ti.App.fireEvent('loadFormsIntoList');
-					// loadFormsIntoList();
+					loadFormsIntoList();
 				} else {
 					// Do nothing
 				}	
@@ -181,6 +187,41 @@ $.completedFormsTableView.addEventListener('longpress', function(event) {
 		}
 	}
 });
+
+function plotPointsOnMap() {
+	var completedForms = Ti.App.Properties.getList("completedForms");
+	
+	var annotations = [];
+	
+	for (var i = 0; i < completedForms.length; ++i) {
+		var completedForm = Ti.App.Properties.getObject(completedForms[i]);
+		
+		// Need to figure out what index the location field is at
+		var index = null;
+		var originalForm = Ti.App.Properties.getObject(completedForm.formName);
+		for (var i = 0; i < originalForm.talkiviFormItemSet.length; i++) {
+			if (originalForm.talkiviFormItemSet[i].talkiviField.field_type == "Location") {
+				index = i;
+				break;
+			}
+		}
+		
+		if (index != null) {
+			var newAnnotation = Ti.Map.createAnnotation({
+				latitude: completedForm.fields[index].latitude,
+				longitude: completedForm.fields[index].longitude,
+				title: completedForm.TDP_id,
+				// subTitle: maybe,
+				pincolor: Ti.Map.ANNOTATION_RED,
+				animate: true
+			});
+			
+			annotations.push(newAnnotation);
+		}
+	}
+	
+	$.mapView.annotations = annotations;
+}
 
 
 // Deletes a completed form from local persistence

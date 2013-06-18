@@ -2,17 +2,21 @@ function Controller() {
     function saveButtonClicked() {
         var messageString = validateForm();
         if ("" == messageString) {
+            saveForm();
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Success!",
-                message: "Form saved successfully"
+                message: "Form saved successfully",
+                buttonNames: [ "OK" ]
+            });
+            alertDialog.addEventListener("click", function() {
+                $.editFormWindow.close();
             });
             alertDialog.show();
-            saveForm();
-            $.editFormWindow.close();
         } else {
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Invalid Input",
-                message: messageString
+                message: messageString,
+                buttonNames: [ "OK" ]
             });
             alertDialog.show();
         }
@@ -74,23 +78,51 @@ function Controller() {
         id: "editFormWindow"
     });
     $.__views.editFormWindow && $.addTopLevelView($.__views.editFormWindow);
-    $.__views.saveButton = Ti.UI.createButton({
-        id: "saveButton",
-        title: "Save",
-        style: Ti.UI.iPhone.SystemButtonStyle.DONE
-    });
-    saveButtonClicked ? $.__views.saveButton.addEventListener("click", saveButtonClicked) : __defers["$.__views.saveButton!click!saveButtonClicked"] = true;
-    $.__views.editFormWindow.rightNavButton = $.__views.saveButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.editFormWindow.add($.__views.tableView);
+    $.__views.editFormWindow.activity.onCreateOptionsMenu = function(e) {
+        var __alloyId7 = {
+            title: "Save Form",
+            id: "__alloyId6"
+        };
+        $.__views.__alloyId6 = e.menu.add(_.pick(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        $.__views.__alloyId6.applyProperties(_.omit(__alloyId7, Alloy.Android.menuItemCreateArgs));
+        submitFormButtonClicked ? $.__views.__alloyId6.addEventListener("click", submitFormButtonClicked) : __defers["$.__views.__alloyId6!click!submitFormButtonClicked"] = true;
+    };
     exports.destroy = function() {};
     _.extend($, $.__views);
     var formHandler = require("formHandler");
     var formID = arguments[0].formID;
     $.editFormWindow.title = formID;
+    $.editFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
     loadTemplate();
+    var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+    var height = Math.round(.055 * Ti.Platform.displayCaps.platformHeight);
+    var width = spacer - 4;
+    var saveButtonView = Ti.UI.createView({
+        width: width,
+        height: height,
+        left: "2dp",
+        bottom: "2dp",
+        backgroundColor: "#333",
+        borderRadius: "2dp"
+    });
+    var saveButtonLabel = Ti.UI.createLabel({
+        text: "Save Form",
+        font: {
+            fontSize: "14dp"
+        },
+        color: "#FFF"
+    });
+    saveButtonView.add(saveButtonLabel);
+    $.editFormWindow.add(saveButtonView);
+    saveButtonView.addEventListener("click", function() {
+        saveButtonClicked();
+    });
+    $.editFormWindow.backgroundColor = "black";
+    $.tableView.bottom = "50dp";
     $.tableView.addEventListener("longpress", function(event) {
         if ("" != event.rowData.fieldObject.help_text) var alertDialog = Ti.UI.createAlertDialog({
             title: event.rowData.fieldObject.prompt,

@@ -2,17 +2,21 @@ function Controller() {
     function submitButtonClicked() {
         var messageString = validateForm();
         if ("" == messageString) {
+            submitForm();
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Success!",
-                message: "Form submitted successfully"
+                message: "Form submitted successfully",
+                buttonNames: [ "OK" ]
+            });
+            alertDialog.addEventListener("click", function() {
+                $.newFormWindow.close();
             });
             alertDialog.show();
-            submitForm();
-            $.newFormWindow.close();
         } else {
             var alertDialog = Ti.UI.createAlertDialog({
                 title: "Invalid Input",
-                message: messageString
+                message: messageString,
+                buttonNames: [ "OK" ]
             });
             alertDialog.show();
         }
@@ -39,8 +43,23 @@ function Controller() {
         Ti.App.Properties.setList("completedForms", completedForms);
     }
     function loadTemplate() {
-        var template = Ti.App.Properties.getObject(formName);
-        formHandler.generateTemplate(template, $.tableView);
+        var data = Ti.App.Properties.getObject(formName);
+        talkiviFormItemSet = data.talkiviFormItemSet;
+        tableViewRows = [];
+        if (null != talkiviFormItemSet) {
+            for (var i = 0; talkiviFormItemSet.length > i; ++i) {
+                var tableViewRow = fieldHandler.generateFieldView(talkiviFormItemSet[i].talkiviField);
+                tableViewRow.backgroundColor = "black";
+                tableViewRow.color = "white";
+                tableViewRows.push(tableViewRow);
+            }
+            $.tableView.data = tableViewRows;
+        } else {
+            var alertDialog = Ti.UI.createAlertDialog({
+                message: "Invalid form! Form doesn't contain a TalKivi form item set!"
+            });
+            alertDialog.show();
+        }
     }
     function validateForm() {
         var messageString = "";
@@ -48,7 +67,7 @@ function Controller() {
         for (var i = 0; tableViewRows.length > i; i++) {
             fieldObject = tableViewRows[i].fieldObject;
             value = getFieldValue(tableViewRows[i]);
-            if ("" == value || null == value) {
+            if ("" === value || null === value) {
                 if ("No" == fieldObject.required) continue;
                 messageString += fieldObject.prompt + " is a required field.\n";
                 continue;
@@ -58,7 +77,31 @@ function Controller() {
         return messageString;
     }
     function getFieldValue(tableViewRow) {
-        return "Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Checkbox" == tableViewRow.fieldObject.field_type ? tableViewRow.switcher.value : "Integer" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Decimal" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Calculated" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Incremental Text" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Date-Time" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Message" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Location" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
+        if ("Text" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Checkbox" == tableViewRow.fieldObject.field_type) return tableViewRow.switcher.value;
+        if ("Integer" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Decimal" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Calculated" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Incremental Text" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Date" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Time" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Date-Time" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Message" == tableViewRow.fieldObject.field_type) return tableViewRow.textField.value;
+        if ("Location" == tableViewRow.fieldObject.field_type) {
+            var textLocation = tableViewRow.textField.value;
+            var commaIndex = textLocation.indexOf(",");
+            var closingParenIndex = textLocation.indexOf(")");
+            var latitude = textLocation.substring(1, commaIndex);
+            var longitude = textLocation.substring(commaIndex + 2, closingParenIndex);
+            var elevation = textLocation.substring(closingParenIndex + 3, -2);
+            var location = {
+                latitude: latitude,
+                longitude: longitude,
+                elevation: elevation
+            };
+            return location;
+        }
+        return "Photo" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Recording" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Button Selection" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : "Structural Attitude" == tableViewRow.fieldObject.field_type ? tableViewRow.textField.value : tableViewRow.fieldObject.textField;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -71,23 +114,42 @@ function Controller() {
         id: "newFormWindow"
     });
     $.__views.newFormWindow && $.addTopLevelView($.__views.newFormWindow);
-    $.__views.submitButton = Ti.UI.createButton({
-        id: "submitButton",
-        title: "Submit",
-        style: Ti.UI.iPhone.SystemButtonStyle.DONE
-    });
-    submitButtonClicked ? $.__views.submitButton.addEventListener("click", submitButtonClicked) : __defers["$.__views.submitButton!click!submitButtonClicked"] = true;
-    $.__views.newFormWindow.rightNavButton = $.__views.submitButton;
     $.__views.tableView = Ti.UI.createTableView({
         id: "tableView"
     });
     $.__views.newFormWindow.add($.__views.tableView);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var formHandler = require("formHandler");
+    var fieldHandler = require("fieldHandler");
     var formName = arguments[0].formName;
     $.newFormWindow.title = formName;
+    $.newFormWindow.windowSoftInputMode = Ti.UI.Android.SOFT_INPUT_ADJUST_PAN;
     loadTemplate();
+    var spacer = Math.round(Ti.Platform.displayCaps.platformWidth);
+    var height = Math.round(.055 * Ti.Platform.displayCaps.platformHeight);
+    var width = spacer - 4;
+    var submitButtonView = Ti.UI.createView({
+        width: width,
+        height: height,
+        left: "2dp",
+        bottom: "2dp",
+        backgroundColor: "#333",
+        borderRadius: "2dp"
+    });
+    var submitButtonLabel = Ti.UI.createLabel({
+        text: "Submit Form",
+        font: {
+            fontSize: "14dp"
+        },
+        color: "#FFF"
+    });
+    submitButtonView.add(submitButtonLabel);
+    $.newFormWindow.add(submitButtonView);
+    submitButtonView.addEventListener("click", function() {
+        submitButtonClicked();
+    });
+    $.newFormWindow.backgroundColor = "black";
+    $.tableView.bottom = "50dp";
     $.tableView.addEventListener("longpress", function(event) {
         if ("" != event.rowData.fieldObject.help_text) var alertDialog = Ti.UI.createAlertDialog({
             title: event.rowData.fieldObject.prompt,
@@ -122,44 +184,21 @@ function Controller() {
             bottom: 0
         });
         view.add(picker);
-        var cancelButton = Titanium.UI.createButton({
-            title: "Cancel",
-            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+        Ti.API.info("Create Alert Dialog");
+        var dialog = Ti.UI.createAlertDialog({
+            androidView: view,
+            buttonNames: [ "Cancel", "Set" ]
         });
-        var doneButton = Titanium.UI.createButton({
-            title: "Done",
-            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+        dialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = picker.getValue();
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
+            }
         });
-        var spacer = Titanium.UI.createButton({
-            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-        });
-        var toolbar = Titanium.UI.iOS.createToolbar({
-            top: 0,
-            items: [ cancelButton, spacer, doneButton ]
-        });
-        doneButton.addEventListener("click", function() {
-            var date = picker.getValue();
-            var day = date.getDate();
-            var month = date.getMonth() + 1;
-            var year = date.getFullYear();
-            Ti.App.dateTextFieldParameter.value = month + "-" + day + "-" + year;
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
-        });
-        cancelButton.addEventListener("click", function() {
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
-        });
-        view.add(toolbar);
-        $.newFormWindow.add(view);
-        view.animate({
-            bottom: 0,
-            duration: 500
-        });
+        dialog.show();
     });
     Ti.App.addEventListener("createTimePicker", function() {
         var view = Ti.UI.createView({
@@ -174,43 +213,19 @@ function Controller() {
             bottom: 0
         });
         view.add(picker);
-        var cancelButton = Titanium.UI.createButton({
-            title: "Cancel",
-            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+        var dialog = Ti.UI.createAlertDialog({
+            androidView: view,
+            buttonNames: [ "Cancel", "Set" ]
         });
-        var doneButton = Titanium.UI.createButton({
-            title: "Done",
-            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+        dialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = picker.getValue();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
+            }
         });
-        var spacer = Titanium.UI.createButton({
-            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-        });
-        var toolbar = Titanium.UI.iOS.createToolbar({
-            top: 0,
-            items: [ cancelButton, spacer, doneButton ]
-        });
-        doneButton.addEventListener("click", function() {
-            var date = picker.getValue();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-            Ti.App.timeTextFieldParameter.value = hours + ":" + minutes + ":00";
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
-        });
-        cancelButton.addEventListener("click", function() {
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
-        });
-        view.add(toolbar);
-        $.newFormWindow.add(view);
-        view.animate({
-            bottom: 0,
-            duration: 500
-        });
+        dialog.show();
     });
     Ti.App.addEventListener("createDateTimePicker", function() {
         var view = Ti.UI.createView({
@@ -218,53 +233,51 @@ function Controller() {
             bottom: -260
         });
         var date = new Date();
-        var picker = Ti.UI.createPicker({
-            type: Ti.UI.PICKER_TYPE_DATE_AND_TIME,
+        var timeView = Ti.UI.createView({
+            height: 260,
+            bottom: -260
+        });
+        var datePicker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_DATE,
             value: date,
             selectionIndicator: true,
             bottom: 0
         });
-        view.add(picker);
-        var cancelButton = Titanium.UI.createButton({
-            title: "Cancel",
-            style: Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+        view.add(datePicker);
+        var timePicker = Ti.UI.createPicker({
+            type: Ti.UI.PICKER_TYPE_TIME,
+            value: date,
+            selectionIndicator: true,
+            bottom: 0
         });
-        var doneButton = Titanium.UI.createButton({
-            title: "Done",
-            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+        timeView.add(timePicker);
+        var dateDialog = Ti.UI.createAlertDialog({
+            androidView: view,
+            buttonNames: [ "Cancel", "Set" ]
         });
-        var spacer = Titanium.UI.createButton({
-            systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+        var timeDialog = Ti.UI.createAlertDialog({
+            androidView: timeView,
+            buttonNames: [ "Cancel", "Set" ]
         });
-        var toolbar = Titanium.UI.iOS.createToolbar({
-            top: 0,
-            items: [ cancelButton, spacer, doneButton ]
+        var day, month, year, hours, minutes;
+        timeDialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = timePicker.getValue();
+                hours = date.getHours();
+                minutes = date.getMinutes();
+                Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
+            }
         });
-        doneButton.addEventListener("click", function() {
-            var date = picker.getValue();
-            var day = date.getDate();
-            var month = date.getMonth() + 1;
-            var year = date.getFullYear();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-            Ti.App.dateTimeTextFieldParameter.value = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":00";
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
+        dateDialog.addEventListener("click", function(e) {
+            if (0 == e.index) Ti.API.info("Cancel"); else {
+                var date = datePicker.getValue();
+                day = date.getDate();
+                month = date.getMonth() + 1;
+                year = date.getFullYear();
+                timeDialog.show();
+            }
         });
-        cancelButton.addEventListener("click", function() {
-            view.animate({
-                bottom: -260,
-                duration: 500
-            });
-        });
-        view.add(toolbar);
-        $.newFormWindow.add(view);
-        view.animate({
-            bottom: 0,
-            duration: 500
-        });
+        dateDialog.show();
     });
     __defers["$.__views.submitButton!click!submitButtonClicked"] && $.__views.submitButton.addEventListener("click", submitButtonClicked);
     _.extend($, exports);
